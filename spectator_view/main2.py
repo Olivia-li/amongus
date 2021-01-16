@@ -20,7 +20,7 @@ with mss.mss() as sct:
     # The screen part to capture
     monitor = {"top": y1, "left": x1, "width": width, "height": height}
 
-    big = cv2.imread(f"spectator_view/amongus_map_mod.png", 0)
+    big = cv2.imread(f"spectator_view/amongus_map_mod.png")
 
     # 262 × 240
     # 2414 × 1352
@@ -35,32 +35,33 @@ with mss.mss() as sct:
     width_factor = height_factor = 1 / (0.1775 * 4794 / 368)
     new_dimensions = tuple((int(og_dimensions[0] * width_factor), int(og_dimensions[1] * height_factor)))
     big = cv2.resize(big, new_dimensions)
+    big_grey = cv2.cvtColor(big, cv2.COLOR_BGR2GRAY) 
 
-    threshold = 0.3
+    threshold = 0.5
 
-    while "Screen capturing":
+    methods = ['cv.TM_CCOEFF', 'cv.TM_CCOEFF_NORMED', 'cv.TM_CCORR',
+            'cv.TM_CCORR_NORMED', 'cv.TM_SQDIFF', 'cv.TM_SQDIFF_NORMED']
+
+    while True:
         img = np.copy(big)
+        img_gray = np.copy(big_grey)
         last_time = time.time()
         small = np.array(sct.grab(monitor))
-        print(small.shape, big.shape)
         small = small[40:-40, 200:-200]
-        small = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+        small_grey = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
 
-        w, h = small.shape[::-1]
-        res = cv2.matchTemplate(img, small, cv2.TM_CCOEFF_NORMED)
-        loc = np.where(res >= threshold)
+        w, h = small_grey.shape[::-1]
+        res = cv2.matchTemplate(img_gray, small_grey, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-        for pt in zip(*loc[::-1]):
-            cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+        top_left = max_loc 
 
-        cv2.imshow("OpenCV/Numpy normal", img)
+        bottom_right = (top_left[0] + w, top_left[1] + h)
+        cv2.rectangle(img, top_left, bottom_right, 255, 2)
+
+        cv2.imshow("Spectator View", img)
         cv2.imshow("screen", small)
-        cv2.imshow("res", res)
-
-        print(small.shape, big.shape)
-
-        print("fps: {}".format(1 / (time.time() - last_time)))
-
+        
         # Press "q" to quit
         if cv2.waitKey(25) & 0xFF == ord("q"):
             cv2.destroyAllWindows()
