@@ -1,26 +1,30 @@
-import cv2 as cv
-import numpy as np
-from time import time
+import cv2
+import numpy 
+import time
 import mss
 import mss.tools
-
 import pygetwindow
 import pyautogui
 
 with mss.mss() as sct:
-    
+  
+    # You have to have the tab open for this to work
     x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
     print(x1, y1, width, height)
 
     # The screen part to capture
     monitor = {"top": y1, "left": x1, "width": width, "height": height}
-    output = "sct-{top}x{left}_{width}x{height}.png".format(**monitor)
 
-    # Grab the data
-    sct_img = sct.grab(monitor)
+    while "Screen capturing":
+        last_time = time.time()
 
-    # Save to the picture file
-    mss.tools.to_png(sct_img.rgb, sct_img.size, output=output)
-    print(output)
+        img = numpy.array(sct.grab(monitor))
+        
+        cv2.imshow("OpenCV/Numpy normal", img)
 
-print('Done.')
+        print("fps: {}".format(1 / (time.time() - last_time)))
+
+        # Press "q" to quit
+        if cv2.waitKey(25) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
