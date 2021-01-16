@@ -1,20 +1,38 @@
-import numpy as np
 import cv2
+import numpy 
+import time
+import mss
+import mss.tools
+import pygetwindow
+import pyautogui
+import sys
 
-cap = cv2.VideoCapture(0)
+with mss.mss() as sct:
+  
+    # You have to have the tab open for this to work
 
-while(True):
-  # Capture frame-by-frame
-  ret, frame = cap.read()
+    try:
+        x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
 
-  # Our operations on the frame come here
-  gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    except:
+        sys.exit("Please make sure to have your Quicktime Movie iPhone Recording open")
+        
 
-  # Display the resulting frame
-  cv2.imshow('frame',gray)
-  if cv2.waitKey(1) & 0xFF == ord('q'):
-    break
+    print(x1, y1, width, height)
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+    # The screen part to capture
+    monitor = {"top": y1, "left": x1, "width": width, "height": height}
+
+    while "Screen capturing":
+        last_time = time.time()
+
+        img = numpy.array(sct.grab(monitor))
+        
+        cv2.imshow("OpenCV/Numpy normal", img)
+
+        print("fps: {}".format(1 / (time.time() - last_time)))
+
+        # Press "q" to quit
+        if cv2.waitKey(25) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
