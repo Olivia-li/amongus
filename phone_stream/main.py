@@ -1,20 +1,24 @@
-import cv2 as cv
-import numpy as np
-from time import time
+import cv2
+import numpy 
+import time
 import mss
 import mss.tools
 
 
 with mss.mss() as sct:
-    # The screen part to capture
-    monitor = {"top": 0, "left": 0, "width": 500, "height": 500}
-    output = "sct-{top}x{left}_{width}x{height}.png".format(**monitor)
+  # The screen part to capture
+  monitor = {"top": 0, "left": 0, "width": 500, "height": 500}
 
-    # Grab the data
-    sct_img = sct.grab(monitor)
+  while "Screen capturing":
+    last_time = time.time()
 
-    # Save to the picture file
-    mss.tools.to_png(sct_img.rgb, sct_img.size, output=output)
-    print(output)
+    img = numpy.array(sct.grab(monitor))
 
-print('Done.')
+    cv2.imshow("OpenCV/Numpy normal", img)
+
+    print("fps: {}".format(1 / (time.time() - last_time)))
+
+    # Press "q" to quit
+    if cv2.waitKey(25) & 0xFF == ord("q"):
+      cv2.destroyAllWindows()
+      break
