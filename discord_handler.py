@@ -69,7 +69,7 @@ class DiscordHandler:
 
     def disconnect_voice_callback(self, result):
         if result == dsdk.Result.ok:
-            self.lobby_manager.disconnect_lobby(self.lobby_id, disconnect_lobby_callback)
+            self.lobby_manager.disconnect_lobby(self.lobby_id, self.disconnect_lobby_callback)
         else:
             raise Exception(result)
 
@@ -78,8 +78,10 @@ class DiscordHandler:
             raise Exception(result)
 
     def adjust_user_volume(self, username, volume):
-        user_id = self.user_mapping[username]
-        self.voice_manager.set_local_volume(user_id, int(volume * 100))
+        if username != self.app.get_user_manager().get_current_user().username:
+            user_id = self.user_mapping[username]
+            self.voice_manager.set_local_volume(user_id, int(volume * 100))
+            print(f"adjusted volume of {username} to {volume}")
 
     def on_speak(self, lobby_id, user_id, speaking):
         print(lobby_id, user_id, speaking)
@@ -87,6 +89,8 @@ class DiscordHandler:
     def on_member_connect(self, lobby_id, user_id):
         username = self.lobby_manager.get_member_user(self.lobby_id, user_id).username
         self.user_mapping[username] = user_id
+
+        self.adjust_user_volume(username, 0)
         print(f"{username} has joined the lobby!")
 
     def on_member_disconnect(self, lobby_id, user_id):
