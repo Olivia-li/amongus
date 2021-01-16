@@ -6,7 +6,7 @@ import pygetwindow
 import sys
 from matplotlib import pyplot as plt
 import math
-from colorthief import ColorThief
+import phone_stream.colors as colors
 
 from discord_handler import DiscordHandler
 
@@ -83,22 +83,22 @@ class Client:
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
 
-        # Olivia
-        # cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
-        # cv2.imwrite("cropped.png", cropped)
-        # color_cropped = ColorThief('cropped.png')
-        # dominant_color = color_cropped.get_color(quality=6)
-        # return dominant_color  # convert this to actually color like blue or red
+        cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
+        cv2.imwrite("cropped.png", cropped)
+        rgb, color_name = colors.get_character_color('cropped.png')
+        print(rgb, color_name)
+        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+
 
         #Antoine
-        return img[pt_center[1] + 3, pt_center[0],]  # convert this to actually color like blue or red
+        # return img[pt_center[1] + 3, pt_center[0],]  # convert this to actually color like blue or red
 
 
 if __name__ == "__main__":
     dh = DiscordHandler()
 
     host = input("Are you the host? y/n") == "y"
-    color = input("Input your character color: ")
+    # color = input("Input your character color: ")
     username = input("Input your username: ")
 
     if host:

@@ -9,8 +9,9 @@ import sys
 from matplotlib import pyplot as plt
 import math
 from colorthief import ColorThief
+import colors
 
-import string_detection as sd
+# import string_detection as sd
 
 with mss.mss() as sct:
 
@@ -55,12 +56,11 @@ with mss.mss() as sct:
                     print("distance: {}".format(distance))
                     print(img[pt_center[1] + 3, pt_center[0],])
 
-                # cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
-                # cv2.imwrite("cropped.png", cropped)
-                # color_cropped = ColorThief('cropped.png')
-                # dominant_color = color_cropped.get_color(quality=6)
-                # print(dominant_color)
-                # cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+                cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
+                cv2.imwrite("cropped.png", cropped)
+                rgb, color_name = colors.get_character_color('cropped.png')
+                print(rgb, color_name)
+                cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
 
         cv2.imshow("rect", img)
 
