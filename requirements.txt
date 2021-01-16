@@ -1,7 +1,7 @@
 discordsdk==0.2.4
+matplotlib==3.3.3
 mss==6.1.0
 numpy==1.19.5
 opencv-python==4.5.1.48
-Pillow==2.2.1
 PyAutoGUI==0.9.52
 PyGetWindow==0.0.9
