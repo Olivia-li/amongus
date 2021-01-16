@@ -9,3 +9,4 @@ pygetwindow==0.0.9
 pytesseract==0.3.7
 opencv-python==4.5.1.48
 imutil==0.5.4
+webcolors==1.3
