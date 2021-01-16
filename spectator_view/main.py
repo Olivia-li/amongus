@@ -8,7 +8,7 @@ RED = (0, 0, 255)
 recording = cv2.VideoCapture('recording.mkv')
 amongus_map = cv2.imread('amongus_map_mod.png')
 
-w, h = [960, 600]
+w, h = [480, 300]
 
 width_map = 1683
 width_video = w
@@ -54,12 +54,12 @@ while(recording.isOpened()):
     cv2.rectangle(map_copy, top_left, bottom_right, RED, 8)
     cv2.circle(map_copy, midpoint, 10, RED, -1)
 
-    map_display = cv2.resize(map_copy, (int(new_dimensions[0] * 0.2), int(new_dimensions[1] * 0.2)))
-    frame_display = cv2.resize(frame, (int(w * 0.2), int(h * 0.2)))
+    map_display = cv2.resize(map_copy, (int(new_dimensions[0] * 0.4), int(new_dimensions[1] * 0.4)))
+    frame_display = cv2.resize(frame, (int(w * 0.4), int(h * 0.4)))
 
     cv2.imshow('template', map_display)
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    cv2.imshow('frame', frame_display)
+    if cv2.waitKey(100) & 0xFF == ord('q'):
         break
 
 recording.release()
