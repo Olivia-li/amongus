@@ -35,19 +35,23 @@ with mss.mss() as sct:
         img = np.array(sct.grab(monitor))
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+        x_center = 500
+        y_center = 200
+
         for i in range(len(templates)): 
             template, shape = templates[i], templ_shapes[i]
-            res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
-            loc = np.where( res >= threshold)
-
             w, h = shape
             res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
             loc = np.where(res >= threshold)
 
             for pt in zip(*loc[::-1]):
                 cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-                distance = math.sqrt((pt[0]-500)**2 + (pt[1]-200)**2)
-                if pt[0] not in range(475, 525) and pt[1] not in range(175, 225) and distance > 50:
+                distance = math.sqrt((pt[0]-x_center)**2 + (pt[1]-y_center)**2)
+                if (pt[0] in range(470, 530) and pt[1] in range(170, 230)) or distance < 70:
+                    x_center = pt[0]
+                    y_center = pt[1]
+                else:
+                    distance = math.sqrt((pt[0]-x_center)**2 + (pt[1]-y_center)**2)
                     print("distance: {}".format(distance))
 
         cv2.imshow("OpenCV/Numpy normal", img)
