@@ -75,10 +75,14 @@ class Client:
             print(f"distance from {username}: {distance}")
 
             volume = min(max(300 - distance, 0), 150)  # keeping other player's volumes between 0 and 150
-            self.dh.adjust_user_volume(username, volume)
+            # self.dh.adjust_user_volume(username, volume)
 
-    def get_username_from_color(self, username):
-        pass
+    def get_username_from_color(self, color):
+        mapping = {
+            "palevioletred": "Olive",
+            "firebrickred": "Antoine",
+            "yellowgreen": "Nick"
+        }
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
@@ -107,7 +111,7 @@ if __name__ == "__main__":
         activity_secret = input("Please enter the activity secret given by the host").strip()
         dh.join_lobby(activity_secret)
 
-    dh.run()
+    # dh.run()
 
     client = Client()
     client.setup()
