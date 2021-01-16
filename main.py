@@ -72,7 +72,7 @@ class Client:
                     username = self.get_username_from_color(color)
 
                     if username:
-                        volume = int(min(max(300 - distance, 0), 150))  # keeping other player's volumes between 0 and 150
+                        volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 150
 
                         # print(f"distance, volume from {username} ({color}): {distance} {volume}")
                         self.dh.adjust_user_volume(username, volume)
