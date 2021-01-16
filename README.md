@@ -5,3 +5,5 @@
 2. run source venv/bin/activate
 3. install the discord sdk or whatever and do sketchy stuff
 4. run the program!!
+
+brew install tesseract

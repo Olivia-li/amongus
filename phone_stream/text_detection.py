@@ -8,7 +8,7 @@ import cv2
 minConfidence = 0.2
 
 # load the input image and grab the image dimensions
-image = cv2.imread("images/amongusgameplaytest.jpg")
+image = cv2.imread("phone_stream/images/amongusgameplaytest.jpg")
 orig = image.copy()
 (H, W) = image.shape[:2]
 
@@ -31,7 +31,7 @@ layerNames = [
 
 # load the pre-trained EAST text detector
 print("[INFO] loading EAST text detector...")
-net = cv2.dnn.readNet("frozen_east_text_detection.pb")
+net = cv2.dnn.readNet("phone_stream/frozen_east_text_detection.pb")
 
 # construct a blob from the image and then perform a forward pass of
 # the model to obtain the two output layer sets
