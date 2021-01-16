@@ -6,8 +6,9 @@ import mss.tools
 import pygetwindow
 import pyautogui
 
-
 with mss.mss() as sct:
+  
+    # You have to have the tab open for this to work
     x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
     print(x1, y1, width, height)
 
@@ -18,7 +19,7 @@ with mss.mss() as sct:
         last_time = time.time()
 
         img = numpy.array(sct.grab(monitor))
-
+        
         cv2.imshow("OpenCV/Numpy normal", img)
 
         print("fps: {}".format(1 / (time.time() - last_time)))
