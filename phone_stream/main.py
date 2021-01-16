@@ -1,20 +1,20 @@
+import cv2 as cv
 import numpy as np
-import cv2
+from time import time
+import mss
+import mss.tools
 
-cap = cv2.VideoCapture(0)
 
-while(True):
-  # Capture frame-by-frame
-  ret, frame = cap.read()
+with mss.mss() as sct:
+    # The screen part to capture
+    monitor = {"top": 0, "left": 0, "width": 500, "height": 500}
+    output = "sct-{top}x{left}_{width}x{height}.png".format(**monitor)
 
-  # Our operations on the frame come here
-  gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Grab the data
+    sct_img = sct.grab(monitor)
 
-  # Display the resulting frame
-  cv2.imshow('frame',gray)
-  if cv2.waitKey(1) & 0xFF == ord('q'):
-    break
+    # Save to the picture file
+    mss.tools.to_png(sct_img.rgb, sct_img.size, output=output)
+    print(output)
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+print('Done.')
