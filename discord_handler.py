@@ -2,6 +2,7 @@ import time
 import os
 import signal
 import sys
+import threading
 
 import discordsdk as dsdk
 
@@ -103,13 +104,19 @@ class DiscordHandler:
         time.sleep(3)
         sys.exit(0)
         
-
-    def spin(self):
-        while 1:
+    def run(self):
+        thread = threading.Thread(target=self._spin, daemon=True)
+        thread.start()
+        
+    def _spin(self):
+        while True:
             time.sleep(1/10)
             self.app.run_callbacks()
 
 if __name__ == "__main__":
     dh = DiscordHandler()
     dh.create_lobby()
-    dh.spin()
+    dh.run()
+
+    while True:
+        time.sleep(5)
