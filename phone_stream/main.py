@@ -8,6 +8,7 @@ import pyautogui
 import sys
 from matplotlib import pyplot as plt
 import math
+from colorthief import ColorThief
 
 with mss.mss() as sct:
 
@@ -23,7 +24,7 @@ with mss.mss() as sct:
 
     templates = []
     templ_shapes = []
-    threshold = 0.48
+    threshold = 0.47
 
     for i in range(2):
         templates.append(cv2.imread(f"image{i}.png",0))
@@ -46,6 +47,15 @@ with mss.mss() as sct:
 
             for pt in zip(*loc[::-1]):
                 cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+
+                # trying to detect colour of character behind the rectangle but it's too slow
+                # cropped = img[pt[1]:pt[1]+h, pt[0]:pt[0]+w]
+                # cv2.imwrite("cropped.png", cropped)
+                # color_cropped = ColorThief('cropped.png')
+                # dominant_color = color_cropped.get_color(quality=1)
+                # print(dominant_color)
+
+                # Logic to calculate distance between other characters and yourself
                 distance = math.sqrt((pt[0]-x_center)**2 + (pt[1]-y_center)**2)
                 if (pt[0] in range(470, 530) and pt[1] in range(170, 230)) or distance < 70:
                     x_center = pt[0]
@@ -54,7 +64,7 @@ with mss.mss() as sct:
                     distance = math.sqrt((pt[0]-x_center)**2 + (pt[1]-y_center)**2)
                     print("distance: {}".format(distance))
 
-        cv2.imshow("OpenCV/Numpy normal", img)
+        cv2.imshow("Character Recognition", img)
 
         # print("fps: {}".format(1 / (time.time() - last_time)))
 
