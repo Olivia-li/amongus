@@ -5,11 +5,19 @@ import mss
 import mss.tools
 import pygetwindow
 import pyautogui
+import sys
 
 with mss.mss() as sct:
   
     # You have to have the tab open for this to work
-    x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
+
+    try:
+        x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
+
+    except:
+        sys.exit("Please make sure to have your Quicktime Movie iPhone Recording open")
+        
+
     print(x1, y1, width, height)
 
     # The screen part to capture
