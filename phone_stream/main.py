@@ -29,7 +29,7 @@ with mss.mss() as sct:
         templates.append(cv2.imread(f"image{i}.png",0))
         templ_shapes.append(templates[i].shape[::-1])
 
-    while "Screen capturing":
+    while True:
 
         last_time = time.time()
         img = np.array(sct.grab(monitor))
