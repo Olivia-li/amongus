@@ -7,7 +7,6 @@ RED = (0, 0, 255)
 
 recording = cv2.VideoCapture('recording.mkv')
 amongus_map = cv2.imread('amongus_map_mod.png')
-amongus_map = cv2.cvtColor(amongus_map, cv2.COLOR_BGR2GRAY)
 
 w, h = [960, 600]
 
@@ -28,8 +27,7 @@ while(recording.isOpened()):
     frame_counter += 1
     ret, frame = recording.read()
     frame = cv2.resize(frame, (w, h))
-    
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
     if frame_counter < 25:
         continue
 
@@ -57,7 +55,7 @@ while(recording.isOpened()):
     cv2.circle(map_copy, midpoint, 10, RED, -1)
 
     map_display = cv2.resize(map_copy, (int(new_dimensions[0] * 0.2), int(new_dimensions[1] * 0.2)))
-    frame_display = cv2.resize(frame, (int(w * 0.8), int(h * 0.8)))
+    frame_display = cv2.resize(frame, (int(w * 0.2), int(h * 0.2)))
 
     cv2.imshow('template', map_display)
     cv2.imshow('frame', frame)
