@@ -88,11 +88,14 @@ class DiscordHandler:
             raise Exception(result)
 
     def adjust_user_volume(self, username, volume):
-        print(username, volume, self.user_mapping)
-        if username != self.username and username in self.user_mapping:
-            user_id = self.user_mapping[username]
-            self.voice_manager.set_local_volume(user_id, volume)
-            print(f"adjusted volume of {username} to {volume}")
+        try:
+            print(username, volume, self.user_mapping)
+            if username != self.username and username in self.user_mapping:
+                user_id = self.user_mapping[username]
+                self.voice_manager.set_local_volume(user_id, volume)
+                print(f"adjusted volume of {username} to {volume}")
+        except Exception as e:
+            print(e)
 
     def on_speak(self, lobby_id, user_id, speaking):
         print(lobby_id, user_id, speaking)
