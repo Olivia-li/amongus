@@ -22,7 +22,7 @@ class DiscordHandler:
         self.activity_secret = None
         self.user_mapping = {}
 
-        self.lobby_manager.on_speaking = self.on_speak
+        # self.lobby_manager.on_speaking = self.on_speak
         self.lobby_manager.on_member_connect = self.on_member_connect
         self.lobby_manager.on_member_disconnect = self.on_member_disconnect
 
@@ -59,6 +59,14 @@ class DiscordHandler:
         if result == dsdk.Result.ok:
             print(f"connected to lobby {lobby.id}")
 
+            member_count = self.lobby_manager.member_count(lobby.id)
+
+            for i in range(member_count):
+                user_id = self.lobby_manager.get_member_user_id(lobby.id, i)
+                user = self.lobby_manager.get_member_user(lobby.id, user_id)
+
+                self.user_mapping[user.username] = user.id
+
             self.lobby_manager.connect_voice(lobby.id, self.connect_voice_callback)
         else:
             raise Exception(result)
@@ -80,6 +88,7 @@ class DiscordHandler:
             raise Exception(result)
 
     def adjust_user_volume(self, username, volume):
+        print(username, volume, self.user_mapping)
         if username != self.username and username in self.user_mapping:
             user_id = self.user_mapping[username]
             self.voice_manager.set_local_volume(user_id, volume)
