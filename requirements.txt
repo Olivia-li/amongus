@@ -1,10 +1,12 @@
 discordsdk==0.2.4
+colorthief==0.2.1
+imutils==0.5.4
 matplotlib==3.3.3
 mss==6.1.0
 numpy==1.19.5
-opencv-python==4.5.1.48
-PyAutoGUI==0.9.52
-PyGetWindow==0.0.9
-imutil==0.5.4
-Pillow==8.1.0
+pyautogui==0.9.52
+pygetwindow==0.0.9
 pytesseract==0.3.7
+opencv-python==4.5.1.48
+imutil==0.5.4
+pillow==8.1.0
