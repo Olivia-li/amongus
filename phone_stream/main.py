@@ -3,22 +3,27 @@ import numpy
 import time
 import mss
 import mss.tools
+import pygetwindow
+import pyautogui
 
 
 with mss.mss() as sct:
-  # The screen part to capture
-  monitor = {"top": 0, "left": 0, "width": 500, "height": 500}
+    x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
+    print(x1, y1, width, height)
 
-  while "Screen capturing":
-    last_time = time.time()
+    # The screen part to capture
+    monitor = {"top": y1, "left": x1, "width": width, "height": height}
 
-    img = numpy.array(sct.grab(monitor))
+    while "Screen capturing":
+        last_time = time.time()
 
-    cv2.imshow("OpenCV/Numpy normal", img)
+        img = numpy.array(sct.grab(monitor))
 
-    print("fps: {}".format(1 / (time.time() - last_time)))
+        cv2.imshow("OpenCV/Numpy normal", img)
 
-    # Press "q" to quit
-    if cv2.waitKey(25) & 0xFF == ord("q"):
-      cv2.destroyAllWindows()
-      break
+        print("fps: {}".format(1 / (time.time() - last_time)))
+
+        # Press "q" to quit
+        if cv2.waitKey(25) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
+            break
