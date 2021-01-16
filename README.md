@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-# amongus-extensions
-=======
-# Discord Game SDK for Python
+# Among Us Voice Chat and Spectator View
 
 A Python wrapper around Discord's Game SDK.
 
@@ -134,4 +131,3 @@ while 1:
     time.sleep(1/10)
     app.run_callbacks()
 ```
->>>>>>> master
