@@ -72,27 +72,31 @@ class Client:
         if distance > 60:
             color = self.get_character_color(img, pt, w, h)
             username = self.get_username_from_color(color)
-            print(f"distance from {username}: {distance}")
+            print(f"distance from {username} ({color}): {distance}")
 
             volume = min(max(300 - distance, 0), 150)  # keeping other player's volumes between 0 and 150
+
+            print(volume)
             # self.dh.adjust_user_volume(username, volume)
 
     def get_username_from_color(self, color):
         mapping = {
             "palevioletred": "Olive",
             "firebrickred": "Antoine",
-            "yellowgreen": "Nick"
+            "yellowgreen": "nicky"
         }
+
+        return mapping.get(color)
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
 
         cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
-        cv2.imwrite("cropped.png", cropped)
-        rgb, color_name = colors.get_character_color('cropped.png')
-        print(rgb, color_name)
+        cv2.imwrite("ignore/cropped.png", cropped)
+        rgb, color_name = colors.get_character_color('ignore/cropped.png')
         cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
 
+        return color_name
 
         #Antoine
         # return img[pt_center[1] + 3, pt_center[0],]  # convert this to actually color like blue or red
@@ -111,7 +115,7 @@ if __name__ == "__main__":
         activity_secret = input("Please enter the activity secret given by the host").strip()
         dh.join_lobby(activity_secret)
 
-    # dh.run()
+    dh.run()
 
     client = Client()
     client.setup()

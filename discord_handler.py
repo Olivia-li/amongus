@@ -80,7 +80,7 @@ class DiscordHandler:
     def adjust_user_volume(self, username, volume):
         if username != self.app.get_user_manager().get_current_user().username:
             user_id = self.user_mapping[username]
-            self.voice_manager.set_local_volume(user_id, int(volume * 100))
+            self.voice_manager.set_local_volume(user_id, volume)
             print(f"adjusted volume of {username} to {volume}")
 
     def on_speak(self, lobby_id, user_id, speaking):
