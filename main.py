@@ -39,6 +39,7 @@ class Client:
 
         with mss.mss() as sct:
             while True:
+                time.sleep(0.2)
                 img = np.array(sct.grab(self.monitor))
 
                 self.compute(img)
@@ -60,30 +61,33 @@ class Client:
             loc = np.where(res >= self.threshold)
 
             for pt in zip(*loc[::-1]):
-                self.process_frame(img, pt, w, h)
+                pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
+                cv2.circle(img, (self.x_center, self.y_center), 40, (0, 255, 0), 3)
+                # cv2.circle(img, pt_center, 10, (255, 0, 0), -1)
+                cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+                distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
+
+                if distance > 60:
+                    color = self.get_character_color(img, pt, w, h)
+                    username = self.get_username_from_color(color)
+
+                    if username:
+                        volume = min(max(300 - distance, 0), 150)  # keeping other player's volumes between 0 and 150
+
+                        print(f"distance, volume from {username} ({color}): {distance} {volume}")
+                        self.dh.adjust_user_volume(username, volume)
+                        continue
                 
-    def process_frame(self, img, pt, w, h):
-        pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
-        cv2.circle(img, (self.x_center, self.y_center), 40, (0, 255, 0), 3)
-        # cv2.circle(img, pt_center, 10, (255, 0, 0), -1)
-        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-        distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
+    # def process_frame(self, img, pt, w, h):
 
-        if distance > 60:
-            color = self.get_character_color(img, pt, w, h)
-            username = self.get_username_from_color(color)
-            print(f"distance from {username} ({color}): {distance}")
-
-            volume = min(max(300 - distance, 0), 150)  # keeping other player's volumes between 0 and 150
-
-            print(volume)
-            # self.dh.adjust_user_volume(username, volume)
 
     def get_username_from_color(self, color):
         mapping = {
             "palevioletred": "Olive",
             "firebrickred": "Antoine",
-            "yellowgreen": "nicky"
+            "mediumblue": "nicky",
+            "darkblue": "nicky",
+            "midnightblue": "nicky"
         }
 
         return mapping.get(color)
@@ -103,11 +107,12 @@ class Client:
 
 
 if __name__ == "__main__":
-    dh = DiscordHandler()
 
     host = input("Are you the host? y/n") == "y"
     # color = input("Input your character color: ")
     username = input("Input your username: ")
+
+    dh = DiscordHandler(username)
 
     if host:
         dh.create_lobby()
