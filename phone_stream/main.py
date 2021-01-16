@@ -4,10 +4,16 @@ from time import time
 import mss
 import mss.tools
 
+import pygetwindow
+import pyautogui
 
 with mss.mss() as sct:
+    
+    x1, y1, width, height = pygetwindow.getWindowGeometry('Movie Recording')
+    print(x1, y1, width, height)
+
     # The screen part to capture
-    monitor = {"top": 0, "left": 0, "width": 500, "height": 500}
+    monitor = {"top": y1, "left": x1, "width": width, "height": height}
     output = "sct-{top}x{left}_{width}x{height}.png".format(**monitor)
 
     # Grab the data
