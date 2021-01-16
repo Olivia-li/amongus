@@ -10,7 +10,9 @@ APP_ID = 799831774959763488
 
         
 class DiscordHandler:
-    def __init__(self):
+    def __init__(self, username):
+        self.username = username
+
         self.app = dsdk.Discord(APP_ID, dsdk.CreateFlags.default)
 
         self.lobby_manager = self.app.get_lobby_manager()
@@ -78,9 +80,9 @@ class DiscordHandler:
             raise Exception(result)
 
     def adjust_user_volume(self, username, volume):
-        if username != self.app.get_user_manager().get_current_user().username:
+        if username != self.username and username in self.user_mapping:
             user_id = self.user_mapping[username]
-            self.voice_manager.set_local_volume(user_id, int(volume * 100))
+            self.voice_manager.set_local_volume(user_id, volume)
             print(f"adjusted volume of {username} to {volume}")
 
     def on_speak(self, lobby_id, user_id, speaking):
