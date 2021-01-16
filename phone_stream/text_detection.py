@@ -8,7 +8,7 @@ import cv2
 minConfidence = 0.2
 
 # load the input image and grab the image dimensions
-image = cv2.imread("phone_stream/images/amongusgameplaytest.jpg")
+image = cv2.imread("phone_stream/images/test.jpg")
 orig = image.copy()
 (H, W) = image.shape[:2]
 
