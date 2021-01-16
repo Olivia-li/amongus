@@ -10,3 +10,4 @@ PyAutoGUI==0.9.52
 PyGetWindow==0.0.9
 pytesseract==0.3.7
 imutils
+imutil==0.5.4
