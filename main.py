@@ -52,16 +52,19 @@ class Client:
                     break
 
 
-    def overlappingRectangles(distinct_rectangles, rect2_top, rect2_bot):
+    def overlappingRectangles(self, distinct_rectangles, rect2_top, rect2_bot):
         for rectangle in distinct_rectangles:
             rect1_top = rectangle[0]
             rect1_bot = rectangle[1]
             # one rectangle is on left side of other 
-            if(rect1_top.x >= rect2_bot.x or rect2_top.x >= rect1_bot.x): 
+            if(rect1_top[0] >= rect2_bot[0] or rect2_top[0] >= rect1_bot[0]): 
+                print("top")
                 return False
         
             # one rectangle is above other 
-            if(rect2_top.y <= rect1_bot.y or rect1_top.y <= rect2_bot.y): 
+            if(rect1_top[1] <= rect2_bot[1] or rect2_top[1] <= rect1_bot[1]): 
+                print(distinct_rectangles)
+                print("left")
                 return False
         return True
   
@@ -77,13 +80,17 @@ class Client:
             loc = np.where(res >= self.threshold)
 
             for pt in zip(*loc[::-1]):
-                pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
-                cv2.circle(img, (self.x_center, self.y_center), 40, (0, 255, 0), 3)
-                # cv2.circle(img, pt_center, 10, (255, 0, 0), -1)
-                cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-                distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
+                rect_top = (pt[0], pt[1])
+                rect_bot = (pt[0] + w, pt[1] + h)
+                if len(distinct_rectangles) == 0 or not self.overlappingRectangles(distinct_rectangles, rect_top, rect_bot):
+                    distinct_rectangles.append((rect_top, rect_bot))
+                    pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
+                    cv2.circle(img, (self.x_center, self.y_center), 40, (0, 255, 0), 3)
+                    # cv2.circle(img, pt_center, 10, (255, 0, 0), -1)
+                    cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+                    distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
                 # print(pt)
-                self.process_frame(img, pt, w, h) 
+                # self.process_frame(img, pt, w, h) 
                 
     def process_frame(self, img, pt, w, h):
         image = cv2.circle(img, (pt[0],pt[1]), radius=3, color=(0, 0, 255),thickness=3)
