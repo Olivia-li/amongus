@@ -12,31 +12,35 @@ with mss.mss() as sct:
 
     # You have to have the tab open for this to work
     try:
-        x1, y1, width, height = pygetwindow.getWindowGeometry(
-            'Movie Recording')
-
+        x1, y1, width, height = pygetwindow.getWindowGeometry("Movie Recording")
     except:
-        sys.exit(
-            "Please make sure to have your Quicktime Movie iPhone Recording open")
-
-    print(x1, y1, width, height)
+        sys.exit("Please make sure to have your Quicktime Movie iPhone Recording open")
 
     # The screen part to capture
     monitor = {"top": y1, "left": x1, "width": width, "height": height}
 
-    while "Screen capturing":
+    templates = []
+    templ_shapes = []
+    threshold = 0.4
 
+    for i in range(1, 2):
+        templates.append(cv2.imread(f"templates/image{i}.png", 0))
+        templ_shapes.append(templates[i-1].shape[::-1])
+
+    while True:
+        time.sleep(0.1)
         last_time = time.time()
         img = np.array(sct.grab(monitor))
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        template = cv2.imread('amongus.png', 0)
-        w, h = template.shape[::-1]
-        res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
-        threshold = 0.45
-        loc = np.where(res >= threshold)
 
-        for pt in zip(*loc[::-1]):
-            cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+        for template, shape in zip(templates, templ_shapes): 
+            res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
+            loc = np.where(res >= threshold)
+
+            w, h = shape
+
+            for pt in zip(*loc[::-1]):
+                cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
 
         cv2.imshow("OpenCV/Numpy normal", img)
 
