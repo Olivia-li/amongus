@@ -5,3 +5,8 @@ numpy==1.19.5
 opencv-python==4.5.1.48
 PyAutoGUI==0.9.52
 PyGetWindow==0.0.9
+Pillow==2.2.1
+PyAutoGUI==0.9.52
+PyGetWindow==0.0.9
+pytesseract==0.3.7
+imutils

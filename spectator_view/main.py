@@ -5,7 +5,7 @@ import cv2
 RED = (0, 0, 255)
 
 
-recording = cv2.VideoCapture('recording.mkv')
+recording = cv2.VideoCapture('/Users/olivia/Documents/amongus/spectator_view/recording.mkv')
 amongus_map = cv2.imread('amongus_map_mod.png')
 
 w, h = [480, 300]
@@ -20,7 +20,7 @@ height_factor = height_video / height_map
 
 og_dimensions = [8565, 4794]
 new_dimensions = tuple((int(og_dimensions[0] * width_factor), int(og_dimensions[1] * height_factor)))
-amongus_map = cv2.resize(amongus_map, new_dimensions)
+# amongus_map = cv2.resize(amongus_map, new_dimensions)
 frame_counter = 0
 
 while(recording.isOpened()):
