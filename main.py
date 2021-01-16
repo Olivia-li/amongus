@@ -106,7 +106,9 @@ class Client:
     def get_username_from_color(self, color):
         mapping = {
             "palevioletred": "Olive",
-            "firebrickred": "Antoine",
+            "firebrick": "Antoine",
+            "marroon": "Antoine",
+            "brown": "Antoine",
             "mediumblue": "nicky",
             "darkblue": "nicky",
             "midnightblue": "nicky"
