@@ -39,7 +39,7 @@ class Client:
 
         with mss.mss() as sct:
             while True:
-                time.sleep(0.2)
+                time.sleep(0.1)
                 img = np.array(sct.grab(self.monitor))
 
                 self.compute(img)
@@ -76,10 +76,7 @@ class Client:
 
                         # print(f"distance, volume from {username} ({color}): {distance} {volume}")
                         self.dh.adjust_user_volume(username, volume)
-                        continue
-                
-    # def process_frame(self, img, pt, w, h):
-
+                        break
 
     def get_username_from_color(self, color):
         mapping = {
