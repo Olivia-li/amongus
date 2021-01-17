@@ -115,6 +115,8 @@ class Client:
             for pt, _ in distinct_rectangles:
                 self.process_frame(img, pt, w, h)
 
+            # cv2.imshow("img", img)
+
     def process_frame(self, img, pt, w, h):
         if not self.dh.lobby_id:
             return
@@ -128,7 +130,7 @@ class Client:
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
-            volume = int(min(max(math.exp(-0.5 * (distance - 150)), 0), 100))  # keeping other player's volumes between 0 and 100
+            volume = int(min(max(math.exp(-0.05 * (distance - 150)), 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"{color}: DISTANCE {distance:.2f} | VOLUME {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
