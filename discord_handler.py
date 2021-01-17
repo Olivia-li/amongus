@@ -148,7 +148,5 @@ if __name__ == "__main__":
     dh.create_lobby()
     dh.run()
 
-    time.sleep(2)
     while True:
         time.sleep(1)
-        dh.testing()

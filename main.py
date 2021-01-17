@@ -6,8 +6,7 @@ import pygetwindow
 import sys
 from matplotlib import pyplot as plt
 import math
-import phone_stream.colors as colors
-import string_detection as sd
+import helpers
 import spectator_view.main3 as map_view
 
 from discord_handler import DiscordHandler
@@ -72,7 +71,7 @@ class Client:
         if (pygetwindow.getWindowGeometry("Movie Recording") is not None):
             x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
             img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05), int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
-            string = sd.get_text(img)
+            string = helpers.get_text(img)
             if (len(string) == 6 and string.upper() == string):
                 self.room_id = string
                 return string
@@ -139,7 +138,7 @@ class Client:
 
         cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
         cv2.imwrite("ignore/cropped.png", cropped)
-        rgb, color_name = colors.get_character_color('ignore/cropped.png')
+        rgb, color_name = helpers.get_character_color('ignore/cropped.png')
 
         return color_name
 
