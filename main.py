@@ -161,4 +161,3 @@ if __name__ == "__main__":
     client.setup()
     client.add_discord_handler(dh)
     client.run()
-    map_view.run()
