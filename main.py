@@ -105,10 +105,10 @@ class Client:
             dh.run()
             return
 
-        if self.ticker % 2:
+        if self.ticker % 4:
             map_view.run(self.dh, self.monitor, self.big_grey, self.rgb, img)
 
-        self.ticker = (self.ticker + 1) % 2
+        self.ticker = (self.ticker + 1) % 4
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
