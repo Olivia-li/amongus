@@ -50,7 +50,7 @@ class Client:
 
                 self.compute(img)
 
-                # cv2.imshow("rect", img)
+                cv2.imshow("rect", img)
 
                 # Press "q" to quit
                 if cv2.waitKey(25) & 0xFF == ord("q"):
@@ -129,7 +129,7 @@ class Client:
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
             volume = int(min(max(math.exp(-0.05 * (distance - 150)), 0), 100))  # keeping other player's volumes between 0 and 100
-            print(f"{color}: DISTANCE {distance:.2f} | VOLUME {volume}")
+            print(f"{color} is {distance:.2f} away | volume changed to {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
