@@ -27,16 +27,6 @@ class Client:
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
             self.templ_shapes.append(self.templates[i].shape[::-1])
-
-        # Map setup
-        self.big = cv2.imread(f"spectator_view/amongus_map_mod.png")
-        # Resize big to get best algorithm
-        og_dimensions = [8565, 4794]
-        width_factor = height_factor = 1 / (0.1775 * 4794 / 368)
-        new_dimensions = tuple(
-            (int(og_dimensions[0] * width_factor), int(og_dimensions[1] * height_factor)))
-        self.big = cv2.resize(self.big, new_dimensions)
-        self.big_grey = cv2.cvtColor(self.big, cv2.COLOR_BGR2GRAY)
             
     def get_window(self):
         try:
@@ -106,7 +96,7 @@ class Client:
             return
 
         if self.ticker % 4:
-            map_view.run(self.dh, self.monitor, self.big_grey, self.rgb, img)
+            map_view.run(self.dh, self.monitor, self.rgb, img)
 
         self.ticker = (self.ticker + 1) % 4
 
@@ -138,7 +128,7 @@ class Client:
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
-            volume = int(min(max(175 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
+            volume = int(min(max(math.exp(-0.5 * (x - 150)), 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"{color}: DISTANCE {distance:.2f} | VOLUME {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
