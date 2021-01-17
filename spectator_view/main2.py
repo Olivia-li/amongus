@@ -7,6 +7,7 @@ import pygetwindow
 import pyautogui
 import sys
 from matplotlib import pyplot as plt
+import phone_stream.colors
 
 with mss.mss() as sct:
 
