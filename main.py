@@ -17,6 +17,7 @@ IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 class Client:
     def setup(self):
         self.get_window()
+        self.color = ""
         self.room_id = ""
         self.templates = []
         self.templ_shapes = []
@@ -26,6 +27,16 @@ class Client:
             self.templates.append(cv2.imread(f"image{i}.png", 0))
             self.templ_shapes.append(self.templates[i].shape[::-1])
 
+        # Map setup
+        self.big = cv2.imread(f"spectator_view/amongus_map_mod.png")
+        # Resize big to get best algorithm
+        og_dimensions = [8565, 4794]
+        width_factor = height_factor = 1 / (0.1775 * 4794 / 368)
+        new_dimensions = tuple(
+            (int(og_dimensions[0] * width_factor), int(og_dimensions[1] * height_factor)))
+        self.big = cv2.resize(self.big, new_dimensions)
+        self.big_grey = cv2.cvtColor(self.big, cv2.COLOR_BGR2GRAY)
+            
     def get_window(self):
         try:
             x1, y1, self.x_center, self.y_center = pygetwindow.getWindowGeometry("Movie Recording")
@@ -47,6 +58,7 @@ class Client:
                 img = np.array(sct.grab(self.monitor))
 
                 self.compute(img)
+                map_view.run(self.monitor, self.big, self.big_grey, self.color, img)
 
                 cv2.imshow("rect", img)
 
