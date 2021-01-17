@@ -75,7 +75,7 @@ class Client:
             x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
             img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05), int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
             string = helpers.get_text(img)
-            if (len(string) == 6 and string.upper() == string):
+            if (len(string) == 6 and string.upper() == string): # Among Us game ID
                 self.room_id = string
                 return string
             else:
@@ -86,7 +86,6 @@ class Client:
 
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # ANTOINE YOU PROBABLY WANNA PUT THIS SOMEWHERE ELSE. AND STOP RUNNING IT AFTER I
         if not self.room_id:
             self.get_room_id(img)
 
@@ -115,7 +114,7 @@ class Client:
             for pt, _ in distinct_rectangles:
                 self.process_frame(img, pt, w, h)
 
-            # cv2.imshow("img", img)
+            cv2.imshow("img", img)
 
     def process_frame(self, img, pt, w, h):
         if not self.dh.lobby_id:
@@ -125,8 +124,7 @@ class Client:
         cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
         distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
 
-        color = self.get_character_color(img, pt, w, h)
-        rgb = self.get_character_rgb(img, pt, w, h)
+        color, rgb = self.get_character_color_rgb(img, pt, w, h)
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
@@ -136,32 +134,18 @@ class Client:
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
             self.rgb = rgb
-        # elif distance < 60:
             
-
     def update_color_map(self, color):
-        self.color = color
         self.dh.update_color_map(color)
     
-    
-
-    def get_character_color(self, img, pt, w, h):
+    def get_character_color_rgb(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
 
         cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
         cv2.imwrite("ignore/cropped.png", cropped)
         rgb, color_name = helpers.get_character_color('ignore/cropped.png')
 
-        return color_name
-
-    def get_character_rgb(self, img, pt, w, h):
-        pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
-
-        cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
-        cv2.imwrite("ignore/cropped.png", cropped)
-        rgb, color_name = helpers.get_character_color('ignore/cropped.png')
-
-        return rgb
+        return color_name, rgb
 
 
 if __name__ == "__main__":

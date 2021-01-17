@@ -9,7 +9,7 @@ import sys
 from matplotlib import pyplot as plt
 
 # Map setup
-big = cv2.imread(f"spectator_view/amongus_map_mod.png")
+big = cv2.imread(f"spectator_view/amongus_map.png")
 # Resize big to get best algorithm
 og_dimensions = [8565, 4794]
 width_factor = height_factor = 1 / (0.1775 * 4794 / 368)
