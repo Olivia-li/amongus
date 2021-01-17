@@ -129,6 +129,7 @@ class DiscordHandler:
             if distance < 250:
                 self.firebase.db.child(self.room_id).child("webapp").update({str(self.user_id): {"x": x, "y":y, "color": color}})
                 self.last_coords = (x, y)
+                print(x, y)
 
     def signal_handler(self, signal, frame):
         self.disconnect()

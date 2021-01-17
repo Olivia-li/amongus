@@ -59,7 +59,7 @@ class Client:
 
                 self.compute(img)
 
-                cv2.imshow("rect", img)
+                # cv2.imshow("rect", img)
 
                 # Press "q" to quit
                 if cv2.waitKey(25) & 0xFF == ord("q"):

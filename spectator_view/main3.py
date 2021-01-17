@@ -25,7 +25,7 @@ def run(dh, monitor, big_grey, color, img_stream):
     bottom_right = (top_left[0] + w, top_left[1] + h)
     cv2.rectangle(img_gray, top_left, bottom_right, 255, 2)
 
-    cv2.imshow("Spectator View", img_gray)
+    # cv2.imshow("Spectator View", img_gray)
 
     x_center = int((bottom_right[0]-top_left[0])/2 + top_left[0])
     y_center = int((bottom_right[1]-top_left[1])/2 + top_left[1])
