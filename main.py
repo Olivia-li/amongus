@@ -86,8 +86,13 @@ class Client:
 
         # ANTOINE YOU PROBABLY WANNA PUT THIS SOMEWHERE ELSE. AND STOP RUNNING IT AFTER I
         if not self.room_id:
-            pass
-            # self.get_room_id(img)
+            self.get_room_id(img)
+
+        if self.room_id and not self.dh.room_id and not self.dh.lobby_id:
+            dh.setup(self.room_id)
+            dh.run()
+            return
+
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
             w, h = shape
@@ -136,20 +141,7 @@ class Client:
 
 
 if __name__ == "__main__":
-    host = input("Are you the host? y/n: ") == "y"
-
     dh = DiscordHandler()
-
-    if host:
-        dh.create_lobby()
-    else:
-        activity_secret = input("Please enter the activity secret given by the host: ").strip()
-        dh.join_lobby(activity_secret)
-
-    dh.run()
-
-    while not dh.lobby_id:
-        time.sleep(0.1)
 
     client = Client()
     client.setup()

@@ -10,7 +10,6 @@ import discordsdk as dsdk
 from firebase_handler import FirebaseHandler
 
 APP_ID = 799831774959763488
-COLOR_MD_KEY = "COLOR_MAPPING"
 
 def dummy_callback(result, *args):
     if result != dsdk.Result.ok:
@@ -25,6 +24,7 @@ class DiscordHandler:
         self.user_manager = self.app.get_user_manager()
 
         self.lobby_id = None
+        self.room_id = None
         self.activity_secret = None
         self.color_mapping = {}
 
@@ -36,17 +36,25 @@ class DiscordHandler:
 
         signal.signal(signal.SIGINT, self.signal_handler)
 
+    def setup(self, room_id):
+        if self.firebase.db.child(room_id).get().val():
+            self.join_lobby(self.room_id)
+        else:
+            create_lobby(self.room_id)
+
     def create_lobby(self):
         transaction = self.lobby_manager.get_lobby_create_transaction()
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        transaction.set_metadata("GAME_ID", "ABCDEF")
+        transaction.set_metadata("ROOM_ID", self.room_id)
 
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
-    def join_lobby(self, activity_secret):
-        self.activity_secret = activity_secret
+    def join_lobby(self, room_id):
+        self.room_id = room_id
+        activity_secret = self.firebase.db.child(room_id).child("activity_secret")
+        self.activity_secret = activity_secret.get.val()
         self.lobby_manager.connect_lobby_with_activity_secret(activity_secret, self.connect_lobby_callback)
 
     def disconnect(self):
@@ -55,7 +63,8 @@ class DiscordHandler:
     def create_lobby_callback(self, result, lobby):
         if result == dsdk.Result.ok:
             self.lobby_id = lobby.id
-            self.activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)
+            activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)
+            self.firebase.db.child(room_id).update({"activity_secret": activity_secret})
 
             print(f"created lobby {lobby.id} with secret {self.activity_secret}")
 
@@ -108,7 +117,7 @@ class DiscordHandler:
         self.user_id = user.id
 
     def update_color_map(self, color):
-        self.firebase.db.child(self.lobby_id).child("colors").update({color: str(self.user_id)})
+        self.firebase.db.child(self.room_id).child("colors").update({color: str(self.user_id)})
 
     def signal_handler(self, signal, frame):
         self.disconnect()
