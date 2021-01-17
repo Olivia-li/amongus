@@ -40,15 +40,15 @@ class DiscordHandler:
         if self.firebase.db.child(room_id).get().val():
             self.join_lobby(self.room_id)
         else:
-            create_lobby(self.room_id)
+            self.create_lobby(self.room_id)
 
-    def create_lobby(self):
+    def create_lobby(self, room_id):
         transaction = self.lobby_manager.get_lobby_create_transaction()
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        transaction.set_metadata("ROOM_ID", self.room_id)
-
+        # transaction.set_metadata("ROOM_ID", room_id)
+        self.room_id = room_id
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
     def join_lobby(self, room_id):
@@ -64,7 +64,7 @@ class DiscordHandler:
         if result == dsdk.Result.ok:
             self.lobby_id = lobby.id
             activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)
-            self.firebase.db.child(room_id).update({"activity_secret": activity_secret})
+            self.firebase.db.child(self.room_id).update({"activity_secret": activity_secret})
 
             print(f"created lobby {lobby.id} with secret {self.activity_secret}")
 
