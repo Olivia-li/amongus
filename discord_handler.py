@@ -37,6 +37,7 @@ class DiscordHandler:
         signal.signal(signal.SIGINT, self.signal_handler)
 
     def setup(self, room_id):
+        print("ROOM_ID:", room_id)
         if self.firebase.db.child(room_id).get().val():
             self.join_lobby(self.room_id)
         else:
