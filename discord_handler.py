@@ -99,7 +99,6 @@ class DiscordHandler:
         try:
             if user_id != self.user_id:
                 self.voice_manager.set_local_volume(user_id, volume)
-                print(f"adjusted volume of {str(user_id)[:-5]} to {volume}")
         except Exception as e:
             print("error adjusting volume", e)
 
