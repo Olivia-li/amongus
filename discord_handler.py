@@ -108,7 +108,7 @@ class DiscordHandler:
         self.user_id = user.id
 
     def update_color_map(self, color):
-        self.firebase.child(self.lobby_id).child("colors").update({color: str(self.user_id)})
+        self.firebase.db.child(self.lobby_id).child("colors").update({color: str(self.user_id)})
 
     def signal_handler(self, signal, frame):
         self.disconnect()
@@ -126,8 +126,9 @@ class DiscordHandler:
             self.app.run_callbacks()
             ticker += 1
             if ticker == 10:
-                path = self.firebase.child(self.lobby_id).child("colors")
-                self.color_mapping = path.get().val()
+                path = self.firebase.db.child(self.lobby_id).child("colors")
+                val = path.get().val()
+                self.color_mapping = val if val else {}
                 ticker = 0
 
 

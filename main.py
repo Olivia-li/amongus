@@ -118,7 +118,7 @@ class Client:
             volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"distance, volume from ({color}): {distance} {volume}")
             self.dh.adjust_user_volume(user_id, volume)
-        elif distance < 60 and color not in self.dh.color_mapping and color not in IGNORE_COLORS:
+        elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
 
     def update_color_map(self, color):
