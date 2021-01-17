@@ -4,6 +4,7 @@ import signal
 import sys
 import threading
 import json
+import math
 
 import discordsdk as dsdk
 
@@ -27,6 +28,7 @@ class DiscordHandler:
         self.room_id = None
         self.user_id = None
         self.is_setup = False
+        self.last_coords = (2050, 500)
         self.color_mapping = {}
 
         self.lobby_manager.on_member_connect = self.on_member_connect
@@ -122,7 +124,11 @@ class DiscordHandler:
         self.firebase.db.child(self.room_id).child("colors").update({color: str(self.user_id)})
 
     def update_map_coords(self, x, y, color):
-        self.firebase.db.child(self.room_id).child("webapp").update({str(self.user_id): {"x": x, "y":y, "color": color}})
+            last_x, last_y = self.last_coords
+            distance = math.sqrt((x-last_x)**2 + (y-last_y)**2)
+            if distance < 250:
+                self.firebase.db.child(self.room_id).child("webapp").update({str(self.user_id): {"x": x, "y":y, "color": color}})
+                self.last_coords = (x, y)
 
     def signal_handler(self, signal, frame):
         self.disconnect()
