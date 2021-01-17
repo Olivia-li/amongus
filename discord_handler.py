@@ -90,7 +90,7 @@ class DiscordHandler:
                 self.voice_manager.set_local_volume(user_id, volume)
                 print(f"adjusted volume of {user_id[:-5]} to {volume}")
         except Exception as e:
-            print(e)
+            print("error adjusting volume", e)
 
     def on_member_connect(self, lobby_id, user_id):
         if lobby_id == self.lobby_id:
@@ -112,18 +112,18 @@ class DiscordHandler:
             self.color_mapping = json.loads(md)
 
     def update_color_map(self, color):
-        try:
-            md_str = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
-            md = json.loads(md_str)
-            md[color] = self.user_id
+        # try:
+        md_str = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
+        md = json.loads(md_str)
+        md[color] = self.user_id
 
-            transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
-            transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
+        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
+        transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
 
-            self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
-            time.sleep(1)
-        except Exception as e:
-            print(e)
+        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
+        time.sleep(1)
+        # except Exception as e:
+        #     print(e)
 
     def signal_handler(self, signal, frame):
         self.disconnect()
