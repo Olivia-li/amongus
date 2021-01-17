@@ -22,6 +22,7 @@ class Client:
         self.templ_shapes = []
         self.threshold = 0.47
         self.rgb = ""
+        self.ticker = 0
 
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
@@ -104,7 +105,10 @@ class Client:
             dh.run()
             return
 
-        map_view.run(self.dh, self.monitor, self.big_grey, self.rgb, img)
+        if self.ticker % 2:
+            map_view.run(self.dh, self.monitor, self.big_grey, self.rgb, img)
+
+        self.ticker = (self.ticker + 1) % 2
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
@@ -134,7 +138,7 @@ class Client:
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
-            volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
+            volume = int(min(max(175 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"{color}: DISTANCE {distance:.2f} | VOLUME {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
