@@ -6,6 +6,7 @@ def get_text(img):
     thresh1 = cv2.threshold(gray, 155, 255, cv2.THRESH_BINARY_INV)[1]
 
     text = pytesseract.image_to_string(thresh1)
-    print("Found in image: " + text.strip()) 
+    # print("Found in image: " + text.strip()) 
+    print(text.strip())
 
     return text.strip()
