@@ -10,6 +10,8 @@ import phone_stream.colors as colors
 
 from discord_handler import DiscordHandler
 
+IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
+
 class Client:
     def setup(self):
         self.get_window()
@@ -17,6 +19,8 @@ class Client:
         self.templates = []
         self.templ_shapes = []
         self.threshold = 0.47
+
+        self.update_count = 0
 
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
@@ -96,14 +100,21 @@ class Client:
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = self.dh.color_mapping[color]
-            # print(f"distance, volume from ({color}): {distance} {volume}")
             volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
+            print(f"distance, volume from ({color}): {distance} {volume}")
             self.dh.adjust_user_volume(user_id, volume)
-        elif distance < 60 and color not in self.dh.color_mapping and color != "black" and color != "darkslategrey":
+        elif distance < 60 and color not in self.dh.color_mapping and color not in IGNORE_COLORS:
             self.update_color_map(color)
 
     def update_color_map(self, color):
-        self.dh.update_color_map(color)
+        self.color = color
+        if not self.update_count:
+            self.dh.update_color_map(color)
+            self.update_count += 1
+        else:
+            self.update_count += 1
+            if self.update_count == 20:
+                self.update_count = 0
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))

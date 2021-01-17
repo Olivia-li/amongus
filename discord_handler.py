@@ -14,7 +14,6 @@ def dummy_callback(result, *args):
     if result != dsdk.Result.ok:
         raise Exception(result)
 
-
 class DiscordHandler:
     def __init__(self):
         self.app = dsdk.Discord(APP_ID, dsdk.CreateFlags.default)
@@ -45,7 +44,7 @@ class DiscordHandler:
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
     def join_lobby(self, activity_secret):
-        self.lobby_id, self.activity_secret = activity_secret.split(":")[0], activity_secret
+        self.activity_secret = activity_secret
         self.lobby_manager.connect_lobby_with_activity_secret(activity_secret, self.connect_lobby_callback)
 
     def disconnect(self):
@@ -65,6 +64,7 @@ class DiscordHandler:
     def connect_lobby_callback(self, result, lobby):
         if result == dsdk.Result.ok:
             print(f"connected to lobby {lobby.id}")
+            self.lobby_id = lobby.id
 
             member_count = self.lobby_manager.member_count(lobby.id)
 
@@ -88,7 +88,7 @@ class DiscordHandler:
         try:
             if user_id != self.user_id:
                 self.voice_manager.set_local_volume(user_id, volume)
-                print(f"adjusted volume of {user_id[:-5]} to {volume}")
+                print(f"adjusted volume of {str(user_id)[:-5]} to {volume}")
         except Exception as e:
             print("error adjusting volume", e)
 
@@ -121,7 +121,6 @@ class DiscordHandler:
         transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
 
         self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
-        time.sleep(1)
         # except Exception as e:
         #     print(e)
 
