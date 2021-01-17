@@ -99,36 +99,28 @@ class Client:
                     distinct_rectangles.append((rect_top, rect_bot))
                 
             for pt, _ in distinct_rectangles:
-                pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
-                cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-                distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
+                self.process_frame(img, pt, w, h)
 
-                if distance > 60:
-                    color = self.get_character_color(img, pt, w, h)
-                    username = self.get_username_from_color(color)
+    def process_frame(self, img, pt, w, h):
+        if not self.dh.lobby_id:
+            return
 
+        pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
+        cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
+        distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
 
+        color = self.get_character_color(img, pt, w, h)
 
-                    if username:
-                        # print(f"distance, volume from {username} ({color}): {distance} {volume}")
-                        volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 150
-                        self.dh.adjust_user_volume(username, volume)
+        if distance > 60 and color in self.dh.color_mapping:
+            user_id = self.dh.color_mapping[color]
+            # print(f"distance, volume from ({color}): {distance} {volume}")
+            volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
+            self.dh.adjust_user_volume(user_id, volume)
+        elif distance < 60 and color not in self.dh.color_mapping and color != "black" and color != "darkslategrey":
+            self.update_color_map(color)
 
-
-    def get_username_from_color(self, color):
-        mapping = {
-            "peru": "Olive",
-            "saddlebrown": "Olive",
-            "sienna": "Olive",
-            "firebrick": "Antoine",
-            "marroon": "Antoine",
-            "brown": "Antoine",
-            "mediumblue": "nicky",
-            "darkblue": "nicky",
-            "midnightblue": "nicky"
-        }
-
-        return mapping.get(color)
+    def update_color_map(self, color):
+        self.dh.update_color_map(color)
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
@@ -139,23 +131,22 @@ class Client:
 
         return color_name
 
-        #Antoine
-        # return img[pt_center[1] + 3, pt_center[0],]  # convert this to actually color like blue or red
-
 
 if __name__ == "__main__":
-    host = input("Are you the host? y/n") == "y"
-    username = input("Input your username: ")
+    host = input("Are you the host? y/n: ") == "y"
 
-    dh = DiscordHandler(username)
+    dh = DiscordHandler()
 
     if host:
         dh.create_lobby()
     else:
-        activity_secret = input("Please enter the activity secret given by the host").strip()
+        activity_secret = input("Please enter the activity secret given by the host: ").strip()
         dh.join_lobby(activity_secret)
 
     dh.run()
+
+    while not dh.lobby_id:
+        time.sleep(0.1)
 
     client = Client()
     client.setup()

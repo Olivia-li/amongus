@@ -3,28 +3,34 @@ import os
 import signal
 import sys
 import threading
+import json
 
 import discordsdk as dsdk
 
 APP_ID = 799831774959763488
+COLOR_MD_KEY = "COLOR_MAPPING"
 
-        
+def dummy_callback(result, *args):
+    if result != dsdk.Result.ok:
+        raise Exception(result)
+
+
 class DiscordHandler:
-    def __init__(self, username):
-        self.username = username
-
+    def __init__(self):
         self.app = dsdk.Discord(APP_ID, dsdk.CreateFlags.default)
 
         self.lobby_manager = self.app.get_lobby_manager()
         self.voice_manager = self.app.get_voice_manager()
+        self.user_manager = self.app.get_user_manager()
 
         self.lobby_id = None
         self.activity_secret = None
-        self.user_mapping = {}
+        self.color_mapping = {}
 
-        # self.lobby_manager.on_speaking = self.on_speak
         self.lobby_manager.on_member_connect = self.on_member_connect
         self.lobby_manager.on_member_disconnect = self.on_member_disconnect
+        self.lobby_manager.on_lobby_update = self.on_lobby_update
+        self.user_manager.on_current_user_update = self.on_curr_user_update
 
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -33,7 +39,8 @@ class DiscordHandler:
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        transaction.set_metadata("a", "123")
+        transaction.set_metadata(COLOR_MD_KEY, json.dumps({}))
+        transaction.set_metadata("GAME_ID", "ABCDEF")
 
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
@@ -61,12 +68,6 @@ class DiscordHandler:
 
             member_count = self.lobby_manager.member_count(lobby.id)
 
-            for i in range(member_count):
-                user_id = self.lobby_manager.get_member_user_id(lobby.id, i)
-                user = self.lobby_manager.get_member_user(lobby.id, user_id)
-
-                self.user_mapping[user.username] = user.id
-
             self.lobby_manager.connect_voice(lobby.id, self.connect_voice_callback)
         else:
             raise Exception(result)
@@ -79,43 +80,50 @@ class DiscordHandler:
 
     def disconnect_voice_callback(self, result):
         if result == dsdk.Result.ok:
-            self.lobby_manager.disconnect_lobby(self.lobby_id, self.disconnect_lobby_callback)
+            self.lobby_manager.disconnect_lobby(self.lobby_id, dummy_callback)
         else:
             raise Exception(result)
 
-    def disconnect_lobby_callback(self, result):
-        if result != dsdk.Result.ok:
-            raise Exception(result)
-
-    def adjust_user_volume(self, username, volume):
+    def adjust_user_volume(self, user_id, volume):
         try:
-            print(username, volume, self.user_mapping)
-            if username != self.username and username in self.user_mapping:
-                user_id = self.user_mapping[username]
+            if user_id != self.user_id:
                 self.voice_manager.set_local_volume(user_id, volume)
-                print(f"adjusted volume of {username} to {volume}")
+                print(f"adjusted volume of {user_id[:-5]} to {volume}")
         except Exception as e:
-            print(e)
-
-    def on_speak(self, lobby_id, user_id, speaking):
-        print(lobby_id, user_id, speaking)
+            print("error adjusting volume", e)
 
     def on_member_connect(self, lobby_id, user_id):
-        username = self.lobby_manager.get_member_user(self.lobby_id, user_id).username
-        self.user_mapping[username] = user_id
-
-        self.adjust_user_volume(username, 0)
-        print(f"{username} has joined the lobby!")
+        if lobby_id == self.lobby_id:
+            self.adjust_user_volume(user_id, 0)
+            print(f"{user_id} has joined the lobby!")
 
     def on_member_disconnect(self, lobby_id, user_id):
-        user = self.lobby_manager.get_member_user(self.lobby_id, user_id)
-        username = None
-        for uname, _id in self.user_mapping.items():
-            if user_id == _id:
-                username = self.user_mapping.pop(uname)
-                break
+        if lobby_id == self.lobby_id:
+            print(f"{user_id} has left the lobby!")
 
-        print(f"{username} has left the lobby!")
+    def on_curr_user_update(self):
+        user = self.user_manager.get_current_user()
+        self.user_id = user.id
+
+    def on_lobby_update(self, lobby_id):
+        if lobby_id == self.lobby_id:
+            md = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
+            print("lobby updated", md)
+            self.color_mapping = json.loads(md)
+
+    def update_color_map(self, color):
+        # try:
+        md_str = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
+        md = json.loads(md_str)
+        md[color] = self.user_id
+
+        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
+        transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
+
+        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
+        time.sleep(1)
+        # except Exception as e:
+        #     print(e)
 
     def signal_handler(self, signal, frame):
         self.disconnect()
@@ -131,10 +139,23 @@ class DiscordHandler:
             time.sleep(1/10)
             self.app.run_callbacks()
 
+    def testing(self):
+        print("testing")
+        val = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, "GAME_ID")
+        print(val)
+
+        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
+        transaction.set_metadata("GAME_ID", json.dumps({"test": 4}))
+
+        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
+
+
 if __name__ == "__main__":
     dh = DiscordHandler()
     dh.create_lobby()
     dh.run()
 
+    time.sleep(2)
     while True:
-        time.sleep(5)
+        time.sleep(1)
+        dh.testing()
