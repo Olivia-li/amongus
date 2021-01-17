@@ -7,7 +7,6 @@ import pygetwindow
 import pyautogui
 import sys
 from matplotlib import pyplot as plt
-from discord_handler import DiscordHandler
 
 def run(dh, monitor, big, big_grey, color, img_stream):
     img = np.copy(big)

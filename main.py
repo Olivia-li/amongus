@@ -21,6 +21,7 @@ class Client:
         self.templates = []
         self.templ_shapes = []
         self.threshold = 0.47
+        self.rgb = ""
 
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
@@ -103,7 +104,7 @@ class Client:
             dh.run()
             return
 
-        map_view.run(self.dh, self.monitor, self.big, self.big_grey, self.color, img)
+        map_view.run(self.dh, self.monitor, self.big, self.big_grey, self.rgb, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
@@ -129,6 +130,7 @@ class Client:
         distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
 
         color = self.get_character_color(img, pt, w, h)
+        rgb = self.get_character_rgb(img, pt, w, h)
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
@@ -137,12 +139,14 @@ class Client:
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
+            self.rgb = rgb
         # elif distance < 60:
             
 
     def update_color_map(self, color):
         self.color = color
         self.dh.update_color_map(color)
+    
     
 
     def get_character_color(self, img, pt, w, h):
@@ -153,6 +157,15 @@ class Client:
         rgb, color_name = helpers.get_character_color('ignore/cropped.png')
 
         return color_name
+
+    def get_character_rgb(self, img, pt, w, h):
+        pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
+
+        cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
+        cv2.imwrite("ignore/cropped.png", cropped)
+        rgb, color_name = helpers.get_character_color('ignore/cropped.png')
+
+        return rgb
 
 
 if __name__ == "__main__":
