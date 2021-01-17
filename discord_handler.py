@@ -25,6 +25,7 @@ class DiscordHandler:
 
         self.lobby_id = None
         self.room_id = None
+        self.user_id = None
         self.is_setup = False
         self.color_mapping = {}
 
@@ -46,6 +47,7 @@ class DiscordHandler:
                 self.create_lobby(room_id)
 
     def create_lobby(self, room_id):
+        print("creating lobby")
         transaction = self.lobby_manager.get_lobby_create_transaction()
 
         transaction.set_capacity(10)
@@ -63,6 +65,7 @@ class DiscordHandler:
         self.lobby_manager.disconnect_voice(self.lobby_id, self.disconnect_voice_callback)
 
     def create_lobby_callback(self, result, lobby):
+        print(result)
         if result == dsdk.Result.ok:
             self.lobby_id = lobby.id
             activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)
@@ -99,7 +102,6 @@ class DiscordHandler:
         try:
             if user_id != self.user_id:
                 self.voice_manager.set_local_volume(user_id, volume)
-                print(f"adjusted volume of {str(user_id)[:-5]} to {volume}")
         except Exception as e:
             print("error adjusting volume", e)
 
@@ -120,7 +122,7 @@ class DiscordHandler:
         self.firebase.db.child(self.room_id).child("colors").update({color: str(self.user_id)})
 
     def update_map_coords(self, x, y, color):
-        self.firebase.db.child(self.room_id).child(webapp).update({str(self.user_id): {"x": x, "y":y, "color": color}})
+        self.firebase.db.child(self.room_id).child("webapp").update({str(self.user_id): {"x": x, "y":y, "color": color}})
 
     def signal_handler(self, signal, frame):
         self.disconnect()
@@ -149,7 +151,5 @@ if __name__ == "__main__":
     dh.create_lobby()
     dh.run()
 
-    time.sleep(2)
     while True:
         time.sleep(1)
-        dh.testing()

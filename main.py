@@ -6,8 +6,7 @@ import pygetwindow
 import sys
 from matplotlib import pyplot as plt
 import math
-import phone_stream.colors as colors
-import string_detection as sd
+import helpers
 import spectator_view.main3 as map_view
 
 from discord_handler import DiscordHandler
@@ -17,6 +16,7 @@ IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 class Client:
     def setup(self):
         self.get_window()
+        self.color = ""
         self.room_id = ""
         self.templates = []
         self.templ_shapes = []
@@ -26,6 +26,16 @@ class Client:
             self.templates.append(cv2.imread(f"image{i}.png", 0))
             self.templ_shapes.append(self.templates[i].shape[::-1])
 
+        # Map setup
+        self.big = cv2.imread(f"spectator_view/amongus_map_mod.png")
+        # Resize big to get best algorithm
+        og_dimensions = [8565, 4794]
+        width_factor = height_factor = 1 / (0.1775 * 4794 / 368)
+        new_dimensions = tuple(
+            (int(og_dimensions[0] * width_factor), int(og_dimensions[1] * height_factor)))
+        self.big = cv2.resize(self.big, new_dimensions)
+        self.big_grey = cv2.cvtColor(self.big, cv2.COLOR_BGR2GRAY)
+            
     def get_window(self):
         try:
             x1, y1, self.x_center, self.y_center = pygetwindow.getWindowGeometry("Movie Recording")
@@ -72,7 +82,7 @@ class Client:
         if (pygetwindow.getWindowGeometry("Movie Recording") is not None):
             x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
             img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05), int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
-            string = sd.get_text(img)
+            string = helpers.get_text(img)
             if (len(string) == 6 and string.upper() == string):
                 self.room_id = string
                 return string
@@ -88,10 +98,12 @@ class Client:
         if not self.room_id:
             self.get_room_id(img)
 
-        if self.room_id and not self.dh.room_id and not self.dh.lobby_id:
+        if self.room_id and not self.dh.room_id and not self.dh.lobby_id and not self.dh.user_id:
             dh.setup(self.room_id)
             dh.run()
             return
+
+        map_view.run(self.dh, self.monitor, self.big, self.big_grey, self.color, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
@@ -121,7 +133,7 @@ class Client:
         if distance > 60 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
             volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
-            print(f"COLOR {color}: DISTANCE {distance} | VOLUME {volume}")
+            print(f"{color}: DISTANCE {distance:.2f} | VOLUME {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
@@ -138,7 +150,7 @@ class Client:
 
         cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
         cv2.imwrite("ignore/cropped.png", cropped)
-        rgb, color_name = colors.get_character_color('ignore/cropped.png')
+        rgb, color_name = helpers.get_character_color('ignore/cropped.png')
 
         return color_name
 
