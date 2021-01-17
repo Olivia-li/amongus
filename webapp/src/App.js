@@ -1,11 +1,18 @@
 import './App.css';
 import React, { Component } from 'react';
+import fire from './config';
 
 class App extends Component {
   state = { "blue": {x:20, y:20}, "red": {x:0, y:0}, "yellow": {x:50, y:25}, "lime": {x:30, y:75} }
 
   componentDidMount = () => {
     this.updatePositions({"blue": {x: 200, y:0}})
+    const dotsRef = fire.database().ref('None');
+    dotsRef.on('value', (snapshot) => {
+      snapshot.forEach(data => {
+        console.log(data.val())
+      })
+    })
   }
 
   dotPositions = (dots) => {
@@ -24,7 +31,6 @@ class App extends Component {
   // of form {blue: {x: 0, y:0}, red: {x:1, y:1}}
   updatePositions = (dotsToPositions) => {
     for (const [key, value] of Object.entries(dotsToPositions)) {
-      console.log(key)
       var obj = {}
       obj[key] = key
       this.setState({[key]: {x: value.x, y: value.y}})
