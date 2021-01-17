@@ -90,15 +90,19 @@ class Client:
                     color = self.get_character_color(img, pt, w, h)
                     username = self.get_username_from_color(color)
 
+
+
                     if username:
-                        volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 150
                         # print(f"distance, volume from {username} ({color}): {distance} {volume}")
+                        volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 150
                         self.dh.adjust_user_volume(username, volume)
 
 
     def get_username_from_color(self, color):
         mapping = {
-            "palevioletred": "Olive",
+            "peru": "Olive",
+            "saddlebrown": "Olive",
+            "sienna": "Olive",
             "firebrick": "Antoine",
             "marroon": "Antoine",
             "brown": "Antoine",
