@@ -22,13 +22,6 @@ with mss.mss() as sct:
 
     big = cv2.imread(f"spectator_view/amongus_map_mod.png")
 
-    # 262 × 240
-    # 2414 × 1352
-    # 414 × 376
-
-    # 240 / 1352 = 0.1775
-    # 376 / 240 = 1.5666
-    
     screen_w, screen_h = 0, 0
     og_dimensions = [8565, 4794]
     # width_factor, height_factor = 0.1775 * 1.5666, 0.1775 * 1.5666
@@ -38,9 +31,6 @@ with mss.mss() as sct:
     big_grey = cv2.cvtColor(big, cv2.COLOR_BGR2GRAY) 
 
     threshold = 0.5
-
-    methods = ['cv.TM_CCOEFF', 'cv.TM_CCOEFF_NORMED', 'cv.TM_CCORR',
-            'cv.TM_CCORR_NORMED', 'cv.TM_SQDIFF', 'cv.TM_SQDIFF_NORMED']
 
     while True:
         img = np.copy(big)
@@ -60,7 +50,11 @@ with mss.mss() as sct:
         cv2.rectangle(img, top_left, bottom_right, 255, 2)
 
         cv2.imshow("Spectator View", img)
-        cv2.imshow("screen", small)
+        # cv2.imshow("screen", small)
+
+        x_center = int((bottom_right[0]-top_left[0])/2 + top_left[0])
+        y_center = int((bottom_right[1]-top_left[1])/2 + top_left[1])
+        print(x_center, y_center)
         
         # Press "q" to quit
         if cv2.waitKey(25) & 0xFF == ord("q"):
