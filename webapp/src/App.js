@@ -1,23 +1,38 @@
 import './App.css';
 import React, { Component } from 'react';
 import fire from './config';
-import { all } from 'q';
 
 class App extends Component {
-  state = { "blue": {x:10, y:40}, "red": {x:0, y:30}, "yellow": {x:50, y:25}, "lime": {x:30, y:75} }
+  state = { "blue": {x:0, y:0}, "red": {x:0, y:0}, "yellow": {x:0, y:0}, "lime": {x:0, y:0} }
+
+  colorDict = (red, green, blue) => {
+    if (red > 130 && green < 60 && blue < 60) {
+      return "red"
+    } else if (green > 130 && red < 60 && blue < 60) {
+      return "lime"
+    } else if (blue > 130 && green < 60 && red < 60) {
+      return "blue"
+    } else if (red < 60 && green < 60 && blue < 60) {
+      return "yellow"
+    } else {
+      return "yellow"
+    }
+  }
 
   componentDidMount = () => {
-    const dotsRef = fire.database().ref('HMKBUF').child('webapp');
+    let lobbyId = this.props.match.params.lobbyId
+    console.log(lobbyId)
 
-    const colorDict = {maroon: 'red', firebrick: 'red', brown: 'red', rosybrown: 'red', darkolivegreen: 'red', blue: 'blue'}
+    const dotsRef = fire.database().ref(lobbyId).child('webapp');
 
     dotsRef.on('value', (snapshot) => {
       snapshot.forEach(data => {
         let theData = data.val()
-        console.log(colorDict[theData.color] + " is at " + theData.x + "," + theData.y)
+        let color = this.colorDict(theData.color[0], theData.color[1], theData.color[2])
+        console.log(color + " is at " + theData.x + "," + theData.y)
         var obj = {}
-        obj[colorDict[theData.color]] = colorDict[theData.color]
-        this.setState({[colorDict[theData.color]]: {x: Math.round(theData.x/3), y: Math.round(theData.y/3)}})
+        obj[color] = color
+        this.setState({[color]: {x: Math.round(theData.x/3), y: Math.round(theData.y/3)}})
       })
     })
   }
@@ -47,10 +62,10 @@ class App extends Component {
   render() { 
     const dotPos = this.dotPositions(this.state)
     return (
-      <div>
-        <img src="https://i.redd.it/ldfi6xzs56t51.png" width="1235px" height="691px" />
-        {dotPos}
-      </div>
+        <div>
+          <img src="https://i.redd.it/ldfi6xzs56t51.png" width="1235px" height="691px" />
+          {dotPos}
+        </div>
     )
   }
 }
