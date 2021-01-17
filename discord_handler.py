@@ -25,7 +25,6 @@ class DiscordHandler:
 
         self.lobby_id = None
         self.room_id = None
-        self.activity_secret = None
         self.is_setup = False
         self.color_mapping = {}
 
@@ -57,7 +56,7 @@ class DiscordHandler:
     def join_lobby(self, room_id):
         self.room_id = room_id
         activity_secret = self.firebase.db.child(room_id).child("activity_secret")
-        self.activity_secret = activity_secret.get.val()
+        activity_secret = activity_secret.get().val()
         self.lobby_manager.connect_lobby_with_activity_secret(activity_secret, self.connect_lobby_callback)
 
     def disconnect(self):
