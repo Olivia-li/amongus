@@ -124,9 +124,8 @@ class Client:
 
 if __name__ == "__main__":
 
-    host = True # input("Are you the host? y/n") == "y"
-    # color = input("Input your character color: ")
-    username = "Antoine" # input("Input your username: ")
+    host = input("Are you the host? y/n") == "y"
+    username = input("Input your username: ")
 
     dh = DiscordHandler(username)
 
