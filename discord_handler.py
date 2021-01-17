@@ -52,7 +52,6 @@ class DiscordHandler:
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        # transaction.set_metadata("room_id", room_id)
         self.room_id = room_id
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
