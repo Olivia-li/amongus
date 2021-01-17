@@ -7,13 +7,14 @@ import json
 
 import discordsdk as dsdk
 
+from firebase_handler import FirebaseHandler
+
 APP_ID = 799831774959763488
 COLOR_MD_KEY = "COLOR_MAPPING"
 
 def dummy_callback(result, *args):
     if result != dsdk.Result.ok:
         raise Exception(result)
-
 
 class DiscordHandler:
     def __init__(self):
@@ -29,8 +30,9 @@ class DiscordHandler:
 
         self.lobby_manager.on_member_connect = self.on_member_connect
         self.lobby_manager.on_member_disconnect = self.on_member_disconnect
-        self.lobby_manager.on_lobby_update = self.on_lobby_update
         self.user_manager.on_current_user_update = self.on_curr_user_update
+
+        self.firebase = FirebaseHandler()
 
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -39,13 +41,12 @@ class DiscordHandler:
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        transaction.set_metadata(COLOR_MD_KEY, json.dumps({}))
         transaction.set_metadata("GAME_ID", "ABCDEF")
 
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
     def join_lobby(self, activity_secret):
-        self.lobby_id, self.activity_secret = activity_secret.split(":")[0], activity_secret
+        self.activity_secret = activity_secret
         self.lobby_manager.connect_lobby_with_activity_secret(activity_secret, self.connect_lobby_callback)
 
     def disconnect(self):
@@ -65,6 +66,7 @@ class DiscordHandler:
     def connect_lobby_callback(self, result, lobby):
         if result == dsdk.Result.ok:
             print(f"connected to lobby {lobby.id}")
+            self.lobby_id = lobby.id
 
             member_count = self.lobby_manager.member_count(lobby.id)
 
@@ -88,7 +90,7 @@ class DiscordHandler:
         try:
             if user_id != self.user_id:
                 self.voice_manager.set_local_volume(user_id, volume)
-                print(f"adjusted volume of {user_id[:-5]} to {volume}")
+                print(f"adjusted volume of {str(user_id)[:-5]} to {volume}")
         except Exception as e:
             print("error adjusting volume", e)
 
@@ -105,25 +107,8 @@ class DiscordHandler:
         user = self.user_manager.get_current_user()
         self.user_id = user.id
 
-    def on_lobby_update(self, lobby_id):
-        if lobby_id == self.lobby_id:
-            md = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
-            print("lobby updated", md)
-            self.color_mapping = json.loads(md)
-
     def update_color_map(self, color):
-        # try:
-        md_str = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
-        md = json.loads(md_str)
-        md[color] = self.user_id
-
-        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
-        transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
-
-        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
-        time.sleep(1)
-        # except Exception as e:
-        #     print(e)
+        self.firebase.db.child(self.lobby_id).child("colors").update({color: str(self.user_id)})
 
     def signal_handler(self, signal, frame):
         self.disconnect()
@@ -135,19 +120,16 @@ class DiscordHandler:
         thread.start()
         
     def _spin(self):
+        ticker = 0
         while True:
             time.sleep(1/10)
             self.app.run_callbacks()
-
-    def testing(self):
-        print("testing")
-        val = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, "GAME_ID")
-        print(val)
-
-        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
-        transaction.set_metadata("GAME_ID", json.dumps({"test": 4}))
-
-        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
+            ticker += 1
+            if ticker == 10:
+                path = self.firebase.db.child(self.lobby_id).child("colors")
+                val = path.get().val()
+                self.color_mapping = val if val else {}
+                ticker = 0
 
 
 if __name__ == "__main__":

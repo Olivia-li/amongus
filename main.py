@@ -12,6 +12,8 @@ import spectator_view.main3 as map_view
 
 from discord_handler import DiscordHandler
 
+IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
+
 class Client:
     def setup(self):
         self.get_window()
@@ -84,8 +86,8 @@ class Client:
 
         # ANTOINE YOU PROBABLY WANNA PUT THIS SOMEWHERE ELSE. AND STOP RUNNING IT AFTER I
         if not self.room_id:
-            self.get_room_id(img)
-
+            pass
+            # self.get_room_id(img)
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
             w, h = shape
@@ -113,13 +115,14 @@ class Client:
 
         if distance > 60 and color in self.dh.color_mapping:
             user_id = self.dh.color_mapping[color]
-            # print(f"distance, volume from ({color}): {distance} {volume}")
             volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
+            print(f"distance, volume from ({color}): {distance} {volume}")
             self.dh.adjust_user_volume(user_id, volume)
-        elif distance < 60 and color not in self.dh.color_mapping and color != "black" and color != "darkslategrey":
+        elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
 
     def update_color_map(self, color):
+        self.color = color
         self.dh.update_color_map(color)
 
     def get_character_color(self, img, pt, w, h):
