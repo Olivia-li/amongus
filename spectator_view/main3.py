@@ -8,8 +8,7 @@ import pyautogui
 import sys
 from matplotlib import pyplot as plt
 
-def run(dh, monitor, big, big_grey, color, img_stream):
-    img = np.copy(big)
+def run(dh, monitor, big_grey, color, img_stream):
     img_gray = np.copy(big_grey)
     last_time = time.time()
 
@@ -24,15 +23,14 @@ def run(dh, monitor, big, big_grey, color, img_stream):
     top_left = max_loc 
 
     bottom_right = (top_left[0] + w, top_left[1] + h)
-    cv2.rectangle(img, top_left, bottom_right, 255, 2)
+    cv2.rectangle(img_gray, top_left, bottom_right, 255, 2)
 
-    cv2.imshow("Spectator View", img)
+    cv2.imshow("Spectator View", img_gray)
 
     x_center = int((bottom_right[0]-top_left[0])/2 + top_left[0])
     y_center = int((bottom_right[1]-top_left[1])/2 + top_left[1])
     if (x_center and y_center and color):
         dh.update_map_coords(x_center, y_center, color)
-        print(x_center, y_center)
     
     # Press "q" to quit
     if cv2.waitKey(25) & 0xFF == ord("q"):

@@ -104,7 +104,7 @@ class Client:
             dh.run()
             return
 
-        map_view.run(self.dh, self.monitor, self.big, self.big_grey, self.rgb, img)
+        map_view.run(self.dh, self.monitor, self.big_grey, self.rgb, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
