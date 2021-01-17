@@ -3,7 +3,7 @@ import pyrebase
 url = "https://amongus-htn-default-rtdb.firebaseio.com/"
 
 class FirebaseHandler:
-    def __init__():
+    def __init__(self):
         config = {
             "apiKey": None,
             "authDomain": None,
