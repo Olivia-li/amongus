@@ -26,6 +26,7 @@ class DiscordHandler:
         self.lobby_id = None
         self.room_id = None
         self.activity_secret = None
+        self.is_setup = False
         self.color_mapping = {}
 
         self.lobby_manager.on_member_connect = self.on_member_connect
@@ -37,18 +38,19 @@ class DiscordHandler:
         signal.signal(signal.SIGINT, self.signal_handler)
 
     def setup(self, room_id):
-        print("ROOM_ID:", room_id)
-        if self.firebase.db.child(room_id).get().val():
-            self.join_lobby(self.room_id)
-        else:
-            self.create_lobby(self.room_id)
+        if not self.is_setup:
+            print("ROOM_ID:", room_id)
+            self.is_setup = True
+            if self.firebase.db.child(room_id).get().val():
+                self.join_lobby(room_id)
+            else:
+                self.create_lobby(room_id)
 
     def create_lobby(self, room_id):
         transaction = self.lobby_manager.get_lobby_create_transaction()
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        # transaction.set_metadata("ROOM_ID", room_id)
         self.room_id = room_id
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
@@ -67,7 +69,7 @@ class DiscordHandler:
             activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)
             self.firebase.db.child(self.room_id).update({"activity_secret": activity_secret})
 
-            print(f"created lobby {lobby.id} with secret {self.activity_secret}")
+            print(f"created lobby {lobby.id} with secret {activity_secret}")
 
             self.lobby_manager.connect_voice(self.lobby_id, self.connect_voice_callback)
         else:
@@ -77,8 +79,6 @@ class DiscordHandler:
         if result == dsdk.Result.ok:
             print(f"connected to lobby {lobby.id}")
             self.lobby_id = lobby.id
-
-            member_count = self.lobby_manager.member_count(lobby.id)
 
             self.lobby_manager.connect_voice(lobby.id, self.connect_voice_callback)
         else:
@@ -136,7 +136,7 @@ class DiscordHandler:
             self.app.run_callbacks()
             ticker += 1
             if ticker == 10:
-                path = self.firebase.db.child(self.lobby_id).child("colors")
+                path = self.firebase.db.child(self.room_id).child("colors")
                 val = path.get().val()
                 self.color_mapping = val if val else {}
                 ticker = 0

@@ -73,7 +73,6 @@ class Client:
             x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
             img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05), int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
             string = sd.get_text(img)
-            cv2.imshow("test", img)
             if (len(string) == 6 and string.upper() == string):
                 self.room_id = string
                 return string
