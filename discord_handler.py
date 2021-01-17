@@ -25,6 +25,7 @@ class DiscordHandler:
 
         self.lobby_id = None
         self.room_id = None
+        self.user_id = None
         self.is_setup = False
         self.color_mapping = {}
 
@@ -46,10 +47,12 @@ class DiscordHandler:
                 self.create_lobby(room_id)
 
     def create_lobby(self, room_id):
+        print("creating lobby")
         transaction = self.lobby_manager.get_lobby_create_transaction()
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
+        # transaction.set_metadata("room_id", room_id)
         self.room_id = room_id
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
 
@@ -63,6 +66,7 @@ class DiscordHandler:
         self.lobby_manager.disconnect_voice(self.lobby_id, self.disconnect_voice_callback)
 
     def create_lobby_callback(self, result, lobby):
+        print(result)
         if result == dsdk.Result.ok:
             self.lobby_id = lobby.id
             activity_secret = self.lobby_manager.get_lobby_activity_secret(lobby.id)

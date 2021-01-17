@@ -9,8 +9,7 @@ import sys
 from matplotlib import pyplot as plt
 from discord_handler import DiscordHandler
 
-def run(monitor, big, big_grey, color, img_stream):
-    dh = DiscordHandler()
+def run(dh, monitor, big, big_grey, color, img_stream):
     img = np.copy(big)
     img_gray = np.copy(big_grey)
     last_time = time.time()

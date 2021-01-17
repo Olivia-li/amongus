@@ -58,7 +58,6 @@ class Client:
                 img = np.array(sct.grab(self.monitor))
 
                 self.compute(img)
-                map_view.run(self.monitor, self.big, self.big_grey, self.color, img)
 
                 cv2.imshow("rect", img)
 
@@ -100,10 +99,12 @@ class Client:
         if not self.room_id:
             self.get_room_id(img)
 
-        if self.room_id and not self.dh.room_id and not self.dh.lobby_id:
+        if self.room_id and not self.dh.room_id and not self.dh.lobby_id and not self.dh.user_id:
             dh.setup(self.room_id)
             dh.run()
             return
+
+        map_view.run(self.dh, self.monitor, self.big, self.big_grey, self.color, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
