@@ -7,8 +7,10 @@ import pygetwindow
 import pyautogui
 import sys
 from matplotlib import pyplot as plt
+from discord_handler import DiscordHandler
 
-def run():
+def run(rgb):
+    dh = DiscordHandler()
     with mss.mss() as sct:
         # You have to have the tab open for this to work
         try:
@@ -50,6 +52,7 @@ def run():
             x_center = int((bottom_right[0]-top_left[0])/2 + top_left[0])
             y_center = int((bottom_right[1]-top_left[1])/2 + top_left[1])
             if (x_center and y_center):
+                dh.update_map_coords(x_center, y_center, rgb)
                 print(x_center, y_center)
             
             # Press "q" to quit

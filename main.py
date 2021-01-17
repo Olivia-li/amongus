@@ -125,10 +125,13 @@ class Client:
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
+        # elif distance < 60:
+            
 
     def update_color_map(self, color):
         self.color = color
         self.dh.update_color_map(color)
+    
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))

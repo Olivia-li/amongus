@@ -119,6 +119,9 @@ class DiscordHandler:
     def update_color_map(self, color):
         self.firebase.db.child(self.room_id).child("colors").update({color: str(self.user_id)})
 
+    def update_map_coords(self, x, y, color):
+        self.firebase.db.child(self.room_id).child(webapp).update({str(self.user_id): {"x": x, "y":y, "color": color}})
+
     def signal_handler(self, signal, frame):
         self.disconnect()
         time.sleep(3)
