@@ -7,6 +7,8 @@ import sys
 from matplotlib import pyplot as plt
 import math
 import phone_stream.colors as colors
+import string_detection as sd
+import spectator_view.main3 as map_view
 
 from discord_handler import DiscordHandler
 
@@ -15,7 +17,7 @@ IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 class Client:
     def setup(self):
         self.get_window()
-
+        self.room_id = ""
         self.templates = []
         self.templ_shapes = []
         self.threshold = 0.47
@@ -67,11 +69,26 @@ class Client:
                 return True
 
         return False
+    
+    def get_room_id(self, img):
+        if (pygetwindow.getWindowGeometry("Movie Recording") is not None):
+            x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
+            img = img[int(y_center*2)-57:int(y_center*2)-30, int(x_center)-65:int(x_center)+65]
+            string = sd.get_text(img)
+            if (len(string) == 6 and string.upper() == string):
+                self.room_id = string
+                return string
+            else:
+                return ""
   
     def compute(self, img):
         distinct_rectangles = []
 
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # ANTOINE YOU PROBABLY WANNA PUT THIS SOMEWHERE ELSE. AND STOP RUNNING IT AFTER I
+        if not self.room_id:
+            self.get_room_id(img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
@@ -127,7 +144,6 @@ class Client:
 
 
 if __name__ == "__main__":
-
     host = input("Are you the host? y/n: ") == "y"
 
     dh = DiscordHandler()
