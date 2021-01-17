@@ -80,8 +80,8 @@ class Client:
                 rect_top = (pt[0], pt[1])
                 rect_bot = (pt[0] + w, pt[1] + h)
                 if len(distinct_rectangles) == 0 or not self.overlappingRectangles(distinct_rectangles, rect_top, rect_bot):
-                    print(distinct_rectangles)
                     distinct_rectangles.append((rect_top, rect_bot))
+                    print(distinct_rectangles)
                 
             for pt, _ in distinct_rectangles:
                 image = cv2.circle(img, (pt[0],pt[1]), radius=3, color=(0, 0, 255),thickness=3)
