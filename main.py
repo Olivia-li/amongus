@@ -114,7 +114,7 @@ class Client:
         color = self.get_character_color(img, pt, w, h)
 
         if distance > 60 and color in self.dh.color_mapping:
-            user_id = self.dh.color_mapping[color]
+            user_id = int(self.dh.color_mapping[color])
             volume = int(min(max(250 - distance, 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"distance, volume from ({color}): {distance} {volume}")
             self.dh.adjust_user_volume(user_id, volume)
