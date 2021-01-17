@@ -7,6 +7,8 @@ import json
 
 import discordsdk as dsdk
 
+from firebase_handler import FirebaseHandler
+
 APP_ID = 799831774959763488
 COLOR_MD_KEY = "COLOR_MAPPING"
 
@@ -28,8 +30,9 @@ class DiscordHandler:
 
         self.lobby_manager.on_member_connect = self.on_member_connect
         self.lobby_manager.on_member_disconnect = self.on_member_disconnect
-        self.lobby_manager.on_lobby_update = self.on_lobby_update
         self.user_manager.on_current_user_update = self.on_curr_user_update
+
+        self.firebase = FirebaseHandler()
 
         signal.signal(signal.SIGINT, self.signal_handler)
 
@@ -38,7 +41,6 @@ class DiscordHandler:
 
         transaction.set_capacity(10)
         transaction.set_type(dsdk.enum.LobbyType.public)
-        transaction.set_metadata(COLOR_MD_KEY, json.dumps({}))
         transaction.set_metadata("GAME_ID", "ABCDEF")
 
         self.lobby_manager.create_lobby(transaction, self.create_lobby_callback)
@@ -105,24 +107,8 @@ class DiscordHandler:
         user = self.user_manager.get_current_user()
         self.user_id = user.id
 
-    def on_lobby_update(self, lobby_id):
-        if lobby_id == self.lobby_id:
-            md = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
-            print("lobby updated", md)
-            self.color_mapping = json.loads(md)
-
     def update_color_map(self, color):
-        # try:
-        md_str = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, COLOR_MD_KEY)
-        md = json.loads(md_str)
-        md[color] = self.user_id
-
-        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
-        transaction.set_metadata(COLOR_MD_KEY, json.dumps(md))
-
-        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
-        # except Exception as e:
-        #     print(e)
+        self.firebase.child(self.lobby_id).child("colors").update({color: str(self.user_id)})
 
     def signal_handler(self, signal, frame):
         self.disconnect()
@@ -134,19 +120,15 @@ class DiscordHandler:
         thread.start()
         
     def _spin(self):
+        ticker = 0
         while True:
             time.sleep(1/10)
             self.app.run_callbacks()
-
-    def testing(self):
-        print("testing")
-        val = self.lobby_manager.get_lobby_metadata_value(self.lobby_id, "GAME_ID")
-        print(val)
-
-        transaction = self.lobby_manager.get_lobby_update_transaction(self.lobby_id)
-        transaction.set_metadata("GAME_ID", json.dumps({"test": 4}))
-
-        self.lobby_manager.update_lobby(self.lobby_id, transaction, dummy_callback)
+            ticker += 1
+            if ticker == 10:
+                path = self.firebase.child(self.lobby_id).child("colors")
+                self.color_mapping = path.get().val()
+                ticker = 0
 
 
 if __name__ == "__main__":

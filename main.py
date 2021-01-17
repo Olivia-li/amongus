@@ -22,8 +22,6 @@ class Client:
         self.templ_shapes = []
         self.threshold = 0.47
 
-        self.update_count = 0
-
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
             self.templ_shapes.append(self.templates[i].shape[::-1])
@@ -88,8 +86,8 @@ class Client:
 
         # ANTOINE YOU PROBABLY WANNA PUT THIS SOMEWHERE ELSE. AND STOP RUNNING IT AFTER I
         if not self.room_id:
-            self.get_room_id(img)
-
+            pass
+            # self.get_room_id(img)
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
             w, h = shape
@@ -125,13 +123,7 @@ class Client:
 
     def update_color_map(self, color):
         self.color = color
-        if not self.update_count:
-            self.dh.update_color_map(color)
-            self.update_count += 1
-        else:
-            self.update_count += 1
-            if self.update_count == 20:
-                self.update_count = 0
+        self.dh.update_color_map(color)
 
     def get_character_color(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
