@@ -127,12 +127,13 @@ class Client:
 
         color, rgb = self.get_character_color_rgb(img, pt, w, h)
 
-        if distance > 60 and color in self.dh.color_mapping:
+        if distance > 40 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
-            volume = int(min(max(math.exp(-0.05 * (distance - 150)), 0), 100))  # keeping other player's volumes between 0 and 100
+            volume = 160 - 0.8 * distance  # math.exp(-0.035 * (distance - 200))
+            volume = int(min(max(volume, 0), 100))  # keeping other player's volumes between 0 and 100
             print(f"{color} is {distance:.2f} away | volume changed to {volume}")
             self.dh.adjust_user_volume(user_id, volume)
-        elif distance < 60 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
+        elif distance < 40 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
             self.rgb = rgb
             
