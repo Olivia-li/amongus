@@ -13,6 +13,8 @@ from discord_handler import DiscordHandler
 
 IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 
+LIVE_MAP = True
+
 class Client:
     def setup(self):
         self.get_window()
@@ -50,7 +52,7 @@ class Client:
 
                 self.compute(img)
 
-                cv2.imshow("rect", img)
+                # cv2.imshow("rect", img)
 
                 # Press "q" to quit
                 if cv2.waitKey(25) & 0xFF == ord("q"):
@@ -94,10 +96,9 @@ class Client:
             dh.run()
             return
 
-        if self.ticker % 4:
-            map_view.run(self.dh, self.monitor, self.rgb, img)
-
         self.ticker = (self.ticker + 1) % 4
+        if LIVE_MAP and self.ticker % 4:
+            map_view.run(self.dh, self.monitor, self.rgb, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
@@ -114,7 +115,7 @@ class Client:
             for pt, _ in distinct_rectangles:
                 self.process_frame(img, pt, w, h)
 
-            cv2.imshow("img", img)
+            # cv2.imshow("img", img)
 
     def process_frame(self, img, pt, w, h):
         if not self.dh.lobby_id:

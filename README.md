@@ -1,6 +1,7 @@
 # Among Us Voice Chat and Spectator View
 
 ### Setup
+Make you sure you have Discord installed!
 In the root folder, do the following:
 ```
 brew install tesseract
