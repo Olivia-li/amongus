@@ -47,7 +47,7 @@ class Client:
 
         with mss.mss() as sct:
             while True:
-                time.sleep(0.1)
+                time.sleep(0.25)
                 img = np.array(sct.grab(self.monitor))
 
                 self.compute(img)
