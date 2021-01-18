@@ -13,7 +13,7 @@ from discord_handler import DiscordHandler
 
 IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 
-LIVE_MAP = True
+LIVE_MAP = False
 
 class Client:
     def setup(self):
