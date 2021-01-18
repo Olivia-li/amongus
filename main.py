@@ -112,8 +112,8 @@ class Client:
                 if len(distinct_rectangles) == 0 or not self.overlappingRectangles(distinct_rectangles, rect_top, rect_bot):
                     distinct_rectangles.append((rect_top, rect_bot))
                 
-            for pt, _ in distinct_rectangles:
-                self.process_frame(img, pt, w, h)
+        for pt, _ in distinct_rectangles:
+            self.process_frame(img, pt, w, h)
 
             # cv2.imshow("img", img)
 
