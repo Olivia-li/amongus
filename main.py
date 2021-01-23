@@ -98,7 +98,7 @@ class Client:
 
         self.ticker = (self.ticker + 1) % 4
         if LIVE_MAP and self.ticker % 4:
-            map_view.run(self.dh, self.monitor, self.rgb, img)
+            # map_view.run(self.dh, self.monitor, self.rgb, img)
 
         for i in range(len(self.templates)): 
             template, shape = self.templates[i], self.templ_shapes[i]
