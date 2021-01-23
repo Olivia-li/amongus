@@ -1,6 +1,5 @@
 venv/
 .DS_Store
 __pycache__/
-lib/
 ignore/
 node_modules/
