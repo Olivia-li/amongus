@@ -15,6 +15,7 @@ IGNORE_COLORS = ("black", "darkslategrey", "dimgrey")
 
 LIVE_MAP = False
 
+
 class Client:
     def setup(self):
         self.get_window()
@@ -29,15 +30,19 @@ class Client:
         for i in range(2):
             self.templates.append(cv2.imread(f"image{i}.png", 0))
             self.templ_shapes.append(self.templates[i].shape[::-1])
-            
+
     def get_window(self):
         try:
-            x1, y1, self.x_center, self.y_center = pygetwindow.getWindowGeometry("Movie Recording")
-            self.x_center, self.y_center = int(self.x_center), int(self.y_center)
+            x1, y1, self.x_center, self.y_center = pygetwindow.getWindowGeometry(
+                "Movie Recording")
+            self.x_center, self.y_center = int(
+                self.x_center), int(self.y_center)
         except:
-            sys.exit("Please make sure to have your Quicktime Movie iPhone Recording open")
+            sys.exit(
+                "Please make sure to have your Quicktime Movie iPhone Recording open")
 
-        self.monitor = {"top": y1, "left": x1, "width": self.x_center, "height": self.y_center}
+        self.monitor = {"top": y1, "left": x1,
+                        "width": self.x_center, "height": self.y_center}
 
     def add_discord_handler(self, dh):
         self.dh = dh
@@ -59,7 +64,6 @@ class Client:
                     cv2.destroyAllWindows()
                     break
 
-
     def overlappingRectangles(self, distinct_rectangles, rect2_top, rect2_bot):
         for rectangle in distinct_rectangles:
             rect1_top = rectangle[0]
@@ -71,18 +75,20 @@ class Client:
                 return True
 
         return False
-    
+
     def get_room_id(self, img):
         if (pygetwindow.getWindowGeometry("Movie Recording") is not None):
-            x1, y1, x_center, y_center = pygetwindow.getWindowGeometry("Movie Recording")
-            img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05), int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
+            x1, y1, x_center, y_center = pygetwindow.getWindowGeometry(
+                "Movie Recording")
+            img = img[int(y_center*2)-int(y_center*0.2):int(y_center*2)-int(y_center*0.05),
+                      int(x_center)-int(x_center*0.1):int(x_center)+int(x_center*0.1)]
             string = helpers.get_text(img)
-            if (len(string) == 6 and string.upper() == string): # Among Us game ID
+            if (len(string) == 6 and string.upper() == string):  # Among Us game ID
                 self.room_id = string
                 return string
             else:
                 return ""
-  
+
     def compute(self, img):
         distinct_rectangles = []
 
@@ -97,10 +103,10 @@ class Client:
             return
 
         self.ticker = (self.ticker + 1) % 4
-        if LIVE_MAP and self.ticker % 4:
-            # map_view.run(self.dh, self.monitor, self.rgb, img)
+        # if LIVE_MAP and self.ticker % 4:
+        # map_view.run(self.dh, self.monitor, self.rgb, img)
 
-        for i in range(len(self.templates)): 
+        for i in range(len(self.templates)):
             template, shape = self.templates[i], self.templ_shapes[i]
             w, h = shape
             res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
@@ -111,7 +117,7 @@ class Client:
                 rect_bot = (pt[0] + w, pt[1] + h)
                 if len(distinct_rectangles) == 0 or not self.overlappingRectangles(distinct_rectangles, rect_top, rect_bot):
                     distinct_rectangles.append((rect_top, rect_bot))
-                
+
         for pt, _ in distinct_rectangles:
             self.process_frame(img, pt, w, h)
 
@@ -123,27 +129,31 @@ class Client:
 
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
         cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-        distance = math.sqrt((pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
+        distance = math.sqrt(
+            (pt_center[0]-self.x_center)**2 + (pt_center[1]-self.y_center)**2)
 
         color, rgb = self.get_character_color_rgb(img, pt, w, h)
 
         if distance > 40 and color in self.dh.color_mapping:
             user_id = int(self.dh.color_mapping[color])
-            volume = 160 - 0.8 * distance  # math.exp(-0.035 * (distance - 200))
-            volume = int(min(max(volume, 0), 100))  # keeping other player's volumes between 0 and 100
+            # math.exp(-0.035 * (distance - 200))
+            volume = 160 - 0.8 * distance
+            # keeping other player's volumes between 0 and 100
+            volume = int(min(max(volume, 0), 100))
             print(f"{color} is {distance:.2f} away | volume changed to {volume}")
             self.dh.adjust_user_volume(user_id, volume)
         elif distance < 40 and not color in self.dh.color_mapping and not color in IGNORE_COLORS:
             self.update_color_map(color)
             self.rgb = rgb
-            
+
     def update_color_map(self, color):
         self.dh.update_color_map(color)
-    
+
     def get_character_color_rgb(self, img, pt, w, h):
         pt_center = (pt[0] + int(w / 2), pt[1] + int(h / 2))
 
-        cropped = img[pt_center[1]:pt_center[1]+10, pt_center[0]-5:pt_center[0]+5]
+        cropped = img[pt_center[1]:pt_center[1] +
+                      10, pt_center[0]-5:pt_center[0]+5]
         cv2.imwrite("ignore/cropped.png", cropped)
         rgb, color_name = helpers.get_character_color('ignore/cropped.png')
 
